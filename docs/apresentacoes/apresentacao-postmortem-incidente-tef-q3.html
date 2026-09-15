@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apresentação Executiva: Post-Mortem Blameless & Plano de Ação — Incidente TEF Q3</title>
+  <meta name="description" content="Apresentação executiva detalhando a linha do tempo, causa raiz (exaustão de pool de conexões no concentrador TEF) e melhorias de resiliência implementadas.">
+  <style>
+    :root { color-scheme: dark; --bg: #0b0f19; --card: #111827; --border: #1f2937; --text: #f8fafc; --muted: #94a3b8; --purple: #c084fc; --cyan: #38bdf8; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; line-height: 1.6; margin: 0; padding: 2.5rem 1.5rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    a { color: var(--cyan); text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 1.5rem; }
+    .slide { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; margin-bottom: 1.5rem; }
+    .badge { font-family: monospace; font-size: 0.75rem; color: var(--purple); background: rgba(192,132,252,0.14); padding: 0.2rem 0.6rem; border-radius: 999px; display: inline-block; margin-bottom: 0.6rem; }
+    h1 { font-size: 1.75rem; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.2rem; color: var(--cyan); margin: 0 0 0.5rem; }
+    p, li { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../index.html">← Voltar ao Documentation Hub</a>
+    <section class="slide">
+      <span class="badge">APRESENTAÇÃO • POST-MORTEM SRE</span>
+      <h1>Post-Mortem Blameless &amp; Plano de Ação — Incidente TEF Q3</h1>
+      <p>Revisão executiva da degradação parcial de 11 minutos ocorrida na malha TEF regional e as defesas arquiteturais definitivas implantadas pela equipe de SRE.</p>
+    </section>
+    <section class="slide">
+      <h2>Principais Aprendizados &amp; Ações Concluídas</h2>
+      <ul>
+        <li><strong>MTTR reduzido para 11 min:</strong> Detecção automática pelo alerta de anomalia Davis AI no Dynatrace em 90 segundos.</li>
+        <li><strong>Isolamento de Bulkhead:</strong> Separação dos pools de conexão por adquirente/bandeira para impedir contágio entre filas.</li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>
