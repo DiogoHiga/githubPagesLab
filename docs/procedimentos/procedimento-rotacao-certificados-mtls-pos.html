@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procedimento Operacional: Rotação Zero-Downtime de Certificados mTLS da Frota POS e TEF</title>
+  <meta name="description" content="POP para renovação programada da cadeia de certificados ICP/mTLS nos concentradores TEF e gateways de Captura Física sem desconexão dos terminais POS.">
+  <style>
+    :root { color-scheme: dark; --bg: #0b0f19; --card: #111827; --border: #1f2937; --text: #f8fafc; --muted: #94a3b8; --cyan: #38bdf8; --emerald: #10b981; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; line-height: 1.6; margin: 0; padding: 2.5rem 1.5rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    a { color: var(--cyan); text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 1.5rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; }
+    .badge { font-family: monospace; font-size: 0.75rem; color: var(--cyan); background: rgba(56,189,248,0.12); padding: 0.2rem 0.6rem; border-radius: 999px; display: inline-block; margin-bottom: 0.6rem; }
+    h1 { font-size: 1.7rem; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.15rem; color: var(--cyan); margin: 0 0 0.5rem; }
+    p, li { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../index.html">← Voltar ao Documentation Hub</a>
+    <div class="card">
+      <span class="badge">PROCEDIMENTO • SEGURANÇA &amp; mTLS</span>
+      <h1>Rotação Zero-Downtime de Certificados mTLS da Frota POS e TEF</h1>
+      <p>Roteiro padrão utilizando <code>cert-manager</code> e <code>trust-manager</code> para manter dupla cadeia (CA antiga + CA nova) ativa durante a janela de atualização OTA dos terminais.</p>
+    </div>
+    <div class="card">
+      <h2>Etapas de Execução</h2>
+      <ol>
+        <li>Publicar o novo bundle CA no Secret <code>pos-mtls-ca-bundle</code> com 30 dias de antecedência do vencimento.</li>
+        <li>Validar handshake TLS 1.3 em canário com 1% do tráfego no gateway <code>tef-ingress-canary</code>.</li>
+        <li>Promover certificado folha via rollout progressivo nos clusters AKS produtivos.</li>
+      </ol>
+    </div>
+  </div>
+</body>
+</html>
