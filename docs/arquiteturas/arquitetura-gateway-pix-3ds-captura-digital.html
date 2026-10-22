@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topologia de Referência: Gateway E-Commerce, Pix Síncrono e Autenticação 3DS 2.2</title>
+  <meta name="description" content="Arquitetura de referência dos microsserviços de Captura Digital cobrindo checkout transparente, motor antifraude, 3D-Secure 2.2 e liquidação Pix SPI.">
+  <style>
+    :root { color-scheme: dark; --bg: #0b0f19; --card: #111827; --border: #1f2937; --text: #f8fafc; --muted: #94a3b8; --cyan: #38bdf8; --emerald: #10b981; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; line-height: 1.6; margin: 0; padding: 2.5rem 1.5rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    a { color: var(--cyan); text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 1.5rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; }
+    .badge { font-family: monospace; font-size: 0.75rem; color: var(--cyan); background: rgba(56,189,248,0.12); padding: 0.2rem 0.6rem; border-radius: 999px; display: inline-block; margin-bottom: 0.6rem; }
+    h1 { font-size: 1.7rem; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.15rem; color: var(--cyan); margin: 0 0 0.5rem; }
+    p, li { color: var(--muted); }
+    code { font-family: monospace; color: var(--emerald); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../index.html">← Voltar ao Documentation Hub</a>
+    <div class="card">
+      <span class="badge">ARQUITETURA • CAPTURA DIGITAL</span>
+      <h1>Gateway E-Commerce, Pix Síncrono e Autenticação 3DS 2.2</h1>
+      <p>Visão fim a fim da esteira de Captura Digital no cluster <code>aks-digital-checkout-prd</code>, incluindo proteção contra tempestade de retentativas (Retry Storm) e Circuit Breaker por bandeira.</p>
+    </div>
+    <div class="card">
+      <h2>Fluxo Crítico e SLOs</h2>
+      <ul>
+        <li><strong>API Gateway &amp; Tokenização PCI-DSS:</strong> Cofre de cartões isolado com resposta P95 abaixo de 25ms.</li>
+        <li><strong>Orquestrador 3DS 2.2 &amp; Antifraude:</strong> Fallback automático para fluxo frictionless em caso de degradação do Directory Server.</li>
+        <li><strong>Conector Pix DICT / SPI:</strong> Geração de QR Code dinâmico e webhook de confirmação em menos de 800ms.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

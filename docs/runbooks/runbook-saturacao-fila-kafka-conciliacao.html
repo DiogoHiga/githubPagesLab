@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Runbook Operacional: Consumer Lag Crítico no Kafka de Liquidação e Split</title>
+  <meta name="description" content="Diagnóstico e mitigação de acúmulo de mensagens (Consumer Lag) nos tópicos Kafka de liquidação financeira e conciliação de Captura Física e Digital.">
+  <style>
+    :root { color-scheme: dark; --bg: #0b0f19; --card: #111827; --border: #1f2937; --text: #f8fafc; --muted: #94a3b8; --cyan: #38bdf8; --emerald: #10b981; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; line-height: 1.6; margin: 0; padding: 2.5rem 1.5rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    a { color: var(--cyan); text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 1.5rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; }
+    .badge { font-family: monospace; font-size: 0.75rem; color: var(--emerald); background: rgba(16,185,129,0.12); padding: 0.2rem 0.6rem; border-radius: 999px; display: inline-block; margin-bottom: 0.6rem; }
+    h1 { font-size: 1.7rem; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.15rem; color: var(--cyan); margin: 0 0 0.5rem; }
+    p { color: var(--muted); }
+    pre { background: #070a12; border: 1px solid #334155; border-radius: 8px; padding: 0.9rem; overflow-x: auto; font-family: monospace; color: #e2e8f0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../index.html">← Voltar ao Documentation Hub</a>
+    <div class="card">
+      <span class="badge">RUNBOOK • MENSAGERIA KAFKA</span>
+      <h1>Consumer Lag Crítico no Kafka de Liquidação e Split</h1>
+      <p>Passos para destravar consumidores em <code>CrashLoopBackOff</code> ou rebalanceamento constante no grupo <code>cg-split-settlement-workers</code>.</p>
+    </div>
+    <div class="card">
+      <h2>Inspeção de Partições e Escalonamento</h2>
+      <pre><code># Inspecionar lag por partição no tópico de transações aprovadas
+kafka-consumer-groups.sh --bootstrap-server kafka-prd:9092 \
+  --group cg-split-settlement-workers --describe
+
+# Escalar workers até o limite de partições (24 réplicas)
+kubectl scale deploy/split-worker-settlement -n split-prd --replicas=24</code></pre>
+    </div>
+  </div>
+</body>
+</html>
