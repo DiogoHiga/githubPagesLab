@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procedimento Operacional: Checklist de Pré-Aquecimento (Warm-up) de Clusters AKS para Black Friday</title>
+  <meta name="description" content="Guia passo a passo para pré-escalonamento de Node Pools, ajuste de pisos de HPA, validação de cotas Azure e congelamento de mudanças (Change Freeze) para a Black Friday.">
+  <style>
+    :root { color-scheme: dark; --bg: #0b0f19; --card: #111827; --border: #1f2937; --text: #f8fafc; --muted: #94a3b8; --cyan: #38bdf8; --emerald: #10b981; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; line-height: 1.6; margin: 0; padding: 2.5rem 1.5rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    a { color: var(--cyan); text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 1.5rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem 1.75rem; margin-bottom: 1.25rem; }
+    .badge { font-family: monospace; font-size: 0.75rem; color: var(--cyan); background: rgba(56,189,248,0.12); padding: 0.2rem 0.6rem; border-radius: 999px; display: inline-block; margin-bottom: 0.6rem; }
+    h1 { font-size: 1.7rem; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.15rem; color: var(--cyan); margin: 0 0 0.5rem; }
+    p, li { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../index.html">← Voltar ao Documentation Hub</a>
+    <div class="card">
+      <span class="badge">PROCEDIMENTO • BLACK FRIDAY READINESS</span>
+      <h1>Checklist de Pré-Aquecimento (Warm-up) de Clusters AKS para Black Friday</h1>
+      <p>Procedimento executado em D-3 antes de grandes eventos sazonais nos clusters de Captura Física e Captura Digital.</p>
+    </div>
+    <div class="card">
+      <h2>Itens Obrigatórios de Verificação</h2>
+      <ul>
+        <li>Elevar <code>minReplicas</code> dos serviços tier-0 (<code>split-api</code>, <code>tef-authorizer</code>, <code>pix-spi-gateway</code>) para 70% da capacidade de pico projetada.</li>
+        <li>Validar disponibilidade de vCPUs Standard_D8s_v5 na região <code>brazilsouth</code> e <code>eastus2</code>.</li>
+        <li>Silenciar janelas de manutenção automática de Node OS Upgrade do AKS durante o período de Change Freeze.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>

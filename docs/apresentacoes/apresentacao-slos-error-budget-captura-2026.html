@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apresentação: Governança de SLOs e Error Budget — Captura Física e Digital</title>
+  <meta name="description" content="Deck de governança mensal apresentando indicadores de disponibilidade (SLIs/SLOs), consumo de Error Budget e priorização de confiabilidade vs novas features.">
+  <style>
+    :root { color-scheme: dark; --bg: #0b0f19; --card: #111827; --border: #1f2937; --text: #f8fafc; --muted: #94a3b8; --purple: #c084fc; --cyan: #38bdf8; }
+    body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; line-height: 1.6; margin: 0; padding: 2.5rem 1.5rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    a { color: var(--cyan); text-decoration: none; font-size: 0.9rem; display: inline-block; margin-bottom: 1.5rem; }
+    .slide { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; margin-bottom: 1.5rem; }
+    .badge { font-family: monospace; font-size: 0.75rem; color: var(--purple); background: rgba(192,132,252,0.14); padding: 0.2rem 0.6rem; border-radius: 999px; display: inline-block; margin-bottom: 0.6rem; }
+    h1 { font-size: 1.75rem; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.2rem; color: var(--cyan); margin: 0 0 0.5rem; }
+    p, li { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../index.html">← Voltar ao Documentation Hub</a>
+    <section class="slide">
+      <span class="badge">APRESENTAÇÃO • GOVERNANÇA DE SLOS</span>
+      <h1>Governança de SLOs e Error Budget — Captura Física e Digital</h1>
+      <p>Painel executivo das metas de disponibilidade transacional (99,95% na Captura Física POS/TEF e 99,90% no Gateway de Captura Digital).</p>
+    </section>
+    <section class="slide">
+      <h2>Política de Error Budget</h2>
+      <ul>
+        <li><strong>Acima de 50% de saldo:</strong> Ritmo normal de releases e experimentos controlados de Chaos Engineering.</li>
+        <li><strong>Abaixo de 20% de saldo:</strong> Priorização automática de épicos de resiliência, tuning de recursos e automação de auto-healing.</li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>
