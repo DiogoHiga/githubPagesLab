@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SRE Captura Física e Digital — Documentation Hub</title>
+  <meta name="description" content="Local centralizado para documentações de SRE Captura Física e Digital — Arquiteturas, Runbooks, Procedimentos e Apresentações.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-surface: #111827;
+      --bg-elevated: #1e293b;
+      --border-subtle: #1f2937;
+      --border-strong: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-cyan: #06b6d4;
+      --accent-cyan-light: #38bdf8;
+      --accent-emerald: #10b981;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+    }
+
+    body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(6, 182, 212, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 10%, rgba(16, 185, 129, 0.05), transparent 35%),
+        var(--bg-primary);
+      color: var(--text-primary);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hub-wrapper {
+      max-width: 1240px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2.5rem 1.75rem 4rem;
+      flex: 1;
+    }
+
+    /* Clean Executive Header */
+    .exec-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.75rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .eyebrow-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-cyan-light);
+      margin-bottom: 0.65rem;
+    }
+
+    .eyebrow-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+    }
+
+    .exec-title {
+      font-size: clamp(1.75rem, 2.8vw, 2.35rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: 0.45rem;
+    }
+
+    .exec-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.98rem;
+      max-width: 680px;
+    }
+
+    /* Toolbar: Search + Categories + Sort */
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .toolbar-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.85rem;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1 1 380px;
+      min-width: 260px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.95rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+      pointer-events: none;
+      font-size: 0.95rem;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 0.7rem 2.5rem 0.7rem 2.5rem;
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan-light);
+      box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.16);
+    }
+
+    .search-shortcut {
+      position: absolute;
+      right: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      padding: 0.1rem 0.42rem;
+      pointer-events: none;
+    }
+
+    /* Sort Selector */
+    .sort-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 0.4rem 0.75rem;
+    }
+
+    .sort-label {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .sort-select {
+      background: transparent;
+      color: var(--text-primary);
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 0.86rem;
+      font-weight: 500;
+      outline: none;
+      cursor: pointer;
+      padding-right: 0.25rem;
+    }
+
+    .sort-select option {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+    }
+
+    /* Category Tabs */
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-btn {
+      background: var(--bg-surface);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 0.5rem 0.9rem;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .filter-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      background: var(--bg-elevated);
+    }
+
+    .filter-btn.active {
+      background: rgba(6, 182, 212, 0.14);
+      color: var(--accent-cyan-light);
+      border-color: rgba(56, 189, 248, 0.45);
+      font-weight: 600;
+    }
+
+    .filter-count {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.06rem 0.42rem;
+      border-radius: 999px;
+      background: rgba(11, 15, 25, 0.65);
+      color: var(--text-secondary);
+    }
+
+    .filter-btn.active .filter-count {
+      color: var(--accent-cyan-light);
+      background: rgba(6, 182, 212, 0.2);
+    }
+
+    /* Results Status Line */
+    .results-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .clear-filter-btn {
+      background: none;
+      border: none;
+      color: var(--accent-cyan-light);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      cursor: pointer;
+      text-decoration: underline;
+      display: none;
+    }
+
+    /* Cards Grid */
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .doc-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.45rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .doc-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.45);
+      box-shadow: 0 12px 28px -14px rgba(6, 182, 212, 0.22);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .category-badge {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.22rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    .category-badge.arquiteturas {
+      background: rgba(6, 182, 212, 0.12);
+      color: var(--accent-cyan-light);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .category-badge.runbooks {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .category-badge.procedimentos {
+      background: rgba(56, 189, 248, 0.1);
+      color: #7dd3fc;
+      border: 1px solid rgba(125, 211, 252, 0.25);
+    }
+
+    .category-badge.apresentacoes {
+      background: rgba(168, 85, 247, 0.14);
+      color: #c084fc;
+      border: 1px solid rgba(192, 132, 252, 0.3);
+    }
+
+    .updated-date {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--text-secondary);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.015em;
+      line-height: 1.38;
+    }
+
+    .card-description {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding-top: 0.9rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .card-path {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .open-link {
+      font-family: var(--font-sans);
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent-cyan-light);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: transform 0.15s ease;
+    }
+
+    .doc-card:hover .open-link {
+      transform: translateX(2px);
+    }
+
+    /* Empty State */
+    .empty-state {
+      background: var(--bg-surface);
+      border: 1px dashed var(--border-strong);
+      border-radius: 12px;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--text-secondary);
+      display: none;
+    }
+
+    .empty-state h3 {
+      color: var(--text-primary);
+      margin-bottom: 0.35rem;
+      font-size: 1.05rem;
+    }
+
+    @media (max-width: 768px) {
+      .docs-grid {
+        grid-template-columns: 1fr;
+      }
+      .sort-wrapper {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="hub-wrapper">
+    <!-- Header Clean -->
+    <header class="exec-header">
+      <div class="eyebrow-badge">
+        <span class="eyebrow-dot"></span>
+        <span>SRE • CAPTURA FÍSICA E DIGITAL</span>
+      </div>
+      <h1 class="exec-title">Documentation Hub</h1>
+      <p class="exec-subtitle">
+        Local centralizado para documentações de SRE Captura Física e Digital — Arquiteturas, Runbooks, Procedimentos e Apresentações.
+      </p>
+    </header>
+
+    <!-- Barra de Busca, Ordenação e Categorias -->
+    <section class="toolbar" aria-label="Busca, filtros e ordenação">
+      <div class="toolbar-top">
+        <div class="search-wrapper">
+          <span class="search-icon">⌕</span>
+          <input
+            type="search"
+            id="searchInput"
+            class="search-input"
+            placeholder="Buscar no conteúdo, título, comando ou cluster (ex: aks-split-bra-prd, OOMKill, POS)..."
+            aria-label="Buscar documentos"
+          >
+          <span class="search-shortcut">/</span>
+        </div>
+
+        <div class="sort-wrapper">
+          <label for="sortSelect" class="sort-label">Ordenar:</label>
+          <select id="sortSelect" class="sort-select" aria-label="Ordenar documentos por data ou título">
+            <option value="date-desc">Mais recentes primeiro</option>
+            <option value="date-asc">Mais antigos primeiro</option>
+            <option value="title-asc">Título (A–Z)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-group" role="group" aria-label="Filtrar por categoria">
+        <button type="button" class="filter-btn active" data-category="all">
+          Todos <span class="filter-count" id="badge-all">0</span>
+        </button>
+        <button type="button" class="filter-btn" data-category="arquiteturas">
+          Arquiteturas <span class="filter-count" id="badge-arquiteturas">0</span>
+        </button>
+        <button type="button" class="filter-btn" data-category="runbooks">
+          Runbooks <span class="filter-count" id="badge-runbooks">0</span>
+        </button>
+        <button type="button" class="filter-btn" data-category="procedimentos">
+          Procedimentos <span class="filter-count" id="badge-procedimentos">0</span>
+        </button>
+        <button type="button" class="filter-btn" data-category="apresentacoes">
+          Apresentações <span class="filter-count" id="badge-apresentacoes">0</span>
+        </button>
+      </div>
+    </section>
+
+    <div class="results-bar">
+      <span id="resultsSummary">Carregando documentos...</span>
+      <button type="button" class="clear-filter-btn" id="clearFiltersBtn">Limpar filtros</button>
+    </div>
+
+    <!-- Grid de Documentos -->
+    <main id="docsGrid" class="docs-grid" aria-live="polite"></main>
+
+    <div id="emptyState" class="empty-state">
+      <h3>Nenhum documento encontrado</h3>
+      <p>Tente buscar por outro termo ou alterar a categoria selecionada.</p>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      docs: [],
+      category: 'all',
+      query: '',
+      sortBy: 'date-desc',
+    };
+
+    const CATEGORY_LABELS = {
+      arquiteturas: 'Arquitetura',
+      runbooks: 'Runbook',
+      procedimentos: 'Procedimento',
+      apresentacoes: 'Apresentação',
+    };
+
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const docsGrid = document.getElementById('docsGrid');
+    const emptyState = document.getElementById('emptyState');
+    const resultsSummary = document.getElementById('resultsSummary');
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalizeText(str) {
+      return String(str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+    }
+
+    function buildDocSearchIndex(doc) {
+      const catLabel = CATEGORY_LABELS[doc.category] || '';
+      const combined = [
+        doc.title || '',
+        doc.description || '',
+        doc.category || '',
+        catLabel,
+        doc.path || '',
+        doc.search_text || '',
+        Array.isArray(doc.tags) ? doc.tags.join(' ') : '',
+      ].join(' ');
+      return normalizeText(combined);
+    }
+
+    function updateCounters(docs) {
+      const counts = {
+        total: docs.length,
+        arquiteturas: docs.filter(d => d.category === 'arquiteturas').length,
+        runbooks: docs.filter(d => d.category === 'runbooks').length,
+        procedimentos: docs.filter(d => d.category === 'procedimentos').length,
+        apresentacoes: docs.filter(d => d.category === 'apresentacoes').length,
+      };
+
+      const setCount = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
+      setCount('badge-all', counts.total);
+      setCount('badge-arquiteturas', counts.arquiteturas);
+      setCount('badge-runbooks', counts.runbooks);
+      setCount('badge-procedimentos', counts.procedimentos);
+      setCount('badge-apresentacoes', counts.apresentacoes);
+    }
+
+    function filterAndSortDocuments() {
+      const category = state.category;
+      const tokens = normalizeText(state.query.trim()).split(/\s+/).filter(Boolean);
+
+      const filtered = state.docs.filter(doc => {
+        const matchesCategory = category === 'all' || doc.category === category;
+        if (!matchesCategory) return false;
+        if (tokens.length === 0) return true;
+
+        const haystack = doc._searchIndex || buildDocSearchIndex(doc);
+        return tokens.every(token => haystack.includes(token));
+      });
+
+      return filtered.sort((a, b) => {
+        const dateA = String(a.updated_at || '');
+        const dateB = String(b.updated_at || '');
+        const titleA = String(a.title || '').toLowerCase();
+        const titleB = String(b.title || '').toLowerCase();
+
+        if (state.sortBy === 'date-asc') {
+          return dateA.localeCompare(dateB) || titleA.localeCompare(titleB);
+        }
+        if (state.sortBy === 'title-asc') {
+          return titleA.localeCompare(titleB);
+        }
+        // Default: 'date-desc'
+        return dateB.localeCompare(dateA) || titleA.localeCompare(titleB);
+      });
+    }
+
+    function renderCards() {
+      const filtered = filterAndSortDocuments();
+      const hasActiveFilters = state.category !== 'all' || state.query.trim() !== '';
+      clearFiltersBtn.style.display = hasActiveFilters ? 'inline-block' : 'none';
+
+      resultsSummary.textContent = `${filtered.length} de ${state.docs.length} documento(s)`;
+
+      if (filtered.length === 0) {
+        docsGrid.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      docsGrid.innerHTML = filtered.map(doc => {
+        const catLabel = CATEGORY_LABELS[doc.category] || doc.category;
+
+        return `
+          <a
+            href="${escapeHtml(doc.path)}"
+            class="doc-card"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <div>
+              <div class="card-top">
+                <span class="category-badge ${escapeHtml(doc.category)}">${escapeHtml(catLabel)}</span>
+                <span class="updated-date">${escapeHtml(doc.updated_at || '')}</span>
+              </div>
+              <h2 class="card-title">${escapeHtml(doc.title)}</h2>
+              <p class="card-description">${escapeHtml(doc.description)}</p>
+            </div>
+            <div class="card-footer">
+              <span class="card-path">${escapeHtml(doc.path)}</span>
+              <span class="open-link">Abrir ↗</span>
+            </div>
+          </a>
+        `;
+      }).join('');
+    }
+
+    searchInput.addEventListener('input', (e) => {
+      state.query = e.target.value;
+      renderCards();
+    });
+
+    sortSelect.addEventListener('change', (e) => {
+      state.sortBy = e.target.value;
+      renderCards();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== searchInput) {
+        e.preventDefault();
+        searchInput.focus();
+      }
+    });
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.category = btn.getAttribute('data-category') || 'all';
+        renderCards();
+      });
+    });
+
+    clearFiltersBtn.addEventListener('click', () => {
+      state.category = 'all';
+      state.query = '';
+      searchInput.value = '';
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-category') === 'all');
+      });
+      renderCards();
+    });
+
+    async function initHub() {
+      try {
+        const response = await fetch('./docs.json', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const docs = await response.json();
+        state.docs = (Array.isArray(docs) ? docs : []).filter(d => d.category !== 'examples');
+        state.docs.forEach(doc => {
+          doc._searchIndex = buildDocSearchIndex(doc);
+        });
+        updateCounters(state.docs);
+        renderCards();
+      } catch (err) {
+        resultsSummary.textContent = 'Erro ao carregar ./docs.json.';
+        console.error('Falha ao carregar docs.json:', err);
+      }
+    }
+
+    initHub();
+  </script>
+</body>
+</html>

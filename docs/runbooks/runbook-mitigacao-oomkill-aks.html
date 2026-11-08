@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Runbook Operacional: Diagnóstico e Mitigação de OOMKill no AKS</title>
+  <meta name="description" content="Procedimento de resposta a incidentes para contenção rápida, coleta de evidências e mitigação de eventos Exit Code 137 (OOMKilled) em clusters Azure Kubernetes Service (AKS).">
+  <meta name="tags" content="AKS, Kubernetes, OOMKill, Runbook, Incident Response, kubectl, aks-split-bra-prd">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-surface: #111827;
+      --bg-elevated: #1e293b;
+      --border-subtle: #1f2937;
+      --border-strong: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-cyan: #06b6d4;
+      --accent-cyan-light: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .back-link {
+      color: var(--accent-cyan-light);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .severity-badge {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .header-card {
+      background: linear-gradient(145deg, var(--bg-surface), rgba(30, 41, 59, 0.7));
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      color: var(--accent-cyan-light);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.45rem;
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.65rem;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.96rem;
+    }
+
+    .meta-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1.35rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .meta-item span {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+    }
+
+    .meta-item strong {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      color: var(--text-primary);
+    }
+
+    .step-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.35rem;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .step-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--bg-primary);
+      background: var(--accent-cyan-light);
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+    }
+
+    h2 {
+      font-size: 1.18rem;
+      font-weight: 700;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      margin-bottom: 0.85rem;
+    }
+
+    pre {
+      background: #070a12;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 1rem 1.15rem;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.83rem;
+      color: #e2e8f0;
+      margin-top: 0.5rem;
+    }
+
+    code {
+      font-family: var(--font-mono);
+      color: var(--accent-cyan-light);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <a href="../index.html" class="back-link">← Voltar para SRE Docs Hub</a>
+      <span class="severity-badge">RUNBOOK VALIDADO • SLA P1/P2: 15 MIN</span>
+    </div>
+
+    <header class="header-card">
+      <div class="eyebrow">SRE Runbook • Resposta a Incidentes Kubernetes</div>
+      <h1>Diagnóstico e Mitigação de OOMKill (Exit Code 137) no AKS</h1>
+      <p class="subtitle">
+        Procedimento passo a passo para triagem imediata, coleta de evidências de consumo de memória e mitigação segura de containers encerrados pelo Linux Kernel OOM Killer em clusters produtivos como <code>aks-split-bra-prd</code>.
+      </p>
+      <div class="meta-strip">
+        <div class="meta-item">
+          <span>Sinal de Alerta</span>
+          <strong>OOMKilled / ExitCode 137</strong>
+        </div>
+        <div class="meta-item">
+          <span>Clusters Alvo</span>
+          <strong>aks-split-bra-prd / aks-core-*</strong>
+        </div>
+        <div class="meta-item">
+          <span>Observabilidade</span>
+          <strong>Dynatrace Davis AI &amp; Kube-Events</strong>
+        </div>
+        <div class="meta-item">
+          <span>Validação Pós-Ação</span>
+          <strong>Zero Restarts por 30 min</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="step-card">
+      <div class="step-header">
+        <span class="step-num">PASSO 01</span>
+        <h2>Confirmar Eventos de OOMKill e Identificar Pods Afetados</h2>
+      </div>
+      <p>Conecte-se ao cluster AKS correspondente e inspecione os pods com reinicializações recentes e o motivo de término <code>OOMKilled</code> no estado anterior do container:</p>
+      <pre><code># 1. Selecionar contexto do cluster produtivo
+kubectl config use-context aks-split-bra-prd
+
+# 2. Listar pods com restarts e verificar lastState.terminated.reason
+kubectl get pods -n split-prd -o custom-columns=\
+"NAME:.metadata.name,RESTARTS:.status.containerStatuses[*].restartCount,REASON:.status.containerStatuses[*].lastState.terminated.reason,EXIT_CODE:.status.containerStatuses[*].lastState.terminated.exitCode"
+
+# 3. Inspecionar eventos de kernel/cgroup no namespace
+kubectl get events -n split-prd --sort-by='.lastTimestamp' | grep -iE "OOM|Killing|Evicted"</code></pre>
+    </section>
+
+    <section class="step-card">
+      <div class="step-header">
+        <span class="step-num">PASSO 02</span>
+        <h2>Coletar Logs do Container Anterior e Uso Atual (Working Set)</h2>
+      </div>
+      <p>Antes de aplicar qualquer alteração nos recursos, salve os últimos logs da instância encerrada para análise de causa raiz (ex: spike de payload ou memory leak):</p>
+      <pre><code># Extrair as últimas 250 linhas do container que sofreu crash
+kubectl logs &lt;nome-do-pod&gt; -n split-prd --previous --tail=250 &gt; /tmp/oom-crash-logs.txt
+
+# Verificar consumo em tempo real comparado aos limits configurados
+kubectl top pods -n split-prd --containers
+kubectl describe deployment split-worker-settlement -n split-prd | grep -A 6 -E "Limits|Requests"</code></pre>
+    </section>
+
+    <section class="step-card">
+      <div class="step-header">
+        <span class="step-num">PASSO 03</span>
+        <h2>Mitigação Emergencial (Right-Sizing de Memória + Runtime Flags)</h2>
+      </div>
+      <p>Caso o tráfego produtivo esteja impactado e o node pool possua folga de memória, aplique o patch emergencial elevando o <code>memory limit</code> em 30–50% e abra PR imediato no repositório GitOps para evitar drift:</p>
+      <pre><code># Aplicar patch emergencial de memória no Deployment
+kubectl set resources deployment/split-worker-settlement -n split-prd \
+  --requests=cpu=600m,memory=1024Mi \
+  --limits=cpu=2000m,memory=1536Mi
+
+# Acompanhar rollout seguro sem indisponibilidade
+kubectl rollout status deployment/split-worker-settlement -n split-prd --timeout=180s</code></pre>
+    </section>
+  </div>
+</body>
+</html>

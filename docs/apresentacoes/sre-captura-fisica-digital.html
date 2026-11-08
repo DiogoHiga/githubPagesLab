@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apresentação Executiva: SRE para Captura Física e Digital | SRE Docs Hub</title>
+  <meta name="description" content="Estratégia de confiabilidade, observabilidade unificada e arquitetura resiliente para ecossistemas de pagamentos: terminais POS/TEF, gateways de e-commerce e autorizadores em nuvem.">
+  <meta name="tags" content="SRE, Captura Física, Captura Digital, POS, TEF, Gateways, Observabilidade, Dynatrace, SLOs, Resiliência, Meios de Pagamento, Black Friday">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM: SRE DARK SLATE TOKENS
+       ========================================================================== */
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-surface: #111827;
+      --bg-elevated: #1e293b;
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --border-subtle: #1f2937;
+      --border-strong: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-cyan: #06b6d4;
+      --accent-cyan-light: #38bdf8;
+      --accent-emerald: #10b981;
+      --accent-purple: #c084fc;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --transition-timing: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Ambient Background Gradients */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 85%, rgba(192, 132, 252, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ==========================================================================
+       PROGRESS BAR
+       ========================================================================== */
+    .top-progress-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: rgba(30, 41, 59, 0.6);
+      z-index: 1000;
+    }
+
+    .top-progress-bar {
+      height: 100%;
+      width: 12.5%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-cyan-light), var(--accent-emerald));
+      transition: width 0.35s var(--transition-timing);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
+    /* ==========================================================================
+       TOP BAR & HEADER
+       ========================================================================== */
+    .app-header {
+      position: fixed;
+      top: 4px;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.75rem;
+      z-index: 900;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent-cyan-light);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.08);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: rgba(6, 182, 212, 0.18);
+      border-color: var(--accent-cyan-light);
+      color: #fff;
+      transform: translateX(-2px);
+    }
+
+    .exec-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(192, 132, 252, 0.12);
+      color: var(--accent-purple);
+      border: 1px solid rgba(192, 132, 252, 0.35);
+    }
+
+    .exec-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-purple);
+      box-shadow: 0 0 6px var(--accent-purple);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .icon-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      color: var(--text-secondary);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: var(--font-sans);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border-color: var(--accent-cyan-light);
+    }
+
+    /* ==========================================================================
+       SLIDE DECK STAGE & CONTAINER
+       ========================================================================== */
+    .slide-viewport {
+      position: absolute;
+      top: 64px;
+      bottom: 74px;
+      left: 0;
+      right: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      z-index: 10;
+    }
+
+    .deck-container {
+      position: relative;
+      width: 100%;
+      max-width: 1240px;
+      height: 100%;
+      max-height: 760px;
+      background: rgba(17, 24, 39, 0.95);
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      overflow: hidden;
+    }
+
+    /* Slide Item: Transform Composited Transition */
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 2.75rem 3.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateX(60px);
+      transition: transform 0.45s var(--transition-timing), opacity 0.4s var(--transition-timing), visibility 0.45s;
+      overflow-y: auto;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateX(0);
+      z-index: 5;
+    }
+
+    .slide.past {
+      transform: translateX(-60px);
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Prefers-reduced-motion: instant transition */
+    @media (prefers-reduced-motion: reduce) {
+      .slide {
+        transition: opacity 0.15s ease !important;
+        transform: none !important;
+      }
+      .top-progress-bar {
+        transition: width 0.1s ease !important;
+      }
+    }
+
+    /* ==========================================================================
+       TYPOGRAPHY & SLIDE ANATOMY
+       ========================================================================== */
+    .slide-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .slide-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-cyan-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.5rem;
+    }
+
+    .slide-eyebrow::before {
+      content: "///";
+      color: var(--accent-cyan);
+      opacity: 0.7;
+    }
+
+    .slide-title {
+      font-size: clamp(1.6rem, 2.5vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .slide-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 950px;
+      line-height: 1.55;
+    }
+
+    .slide-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1.25rem;
+      min-height: 0;
+    }
+
+    .slide-footer-note {
+      margin-top: 1.25rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* ==========================================================================
+       REUSABLE LAYOUT PATTERNS & COMPONENTS
+       ========================================================================== */
+    /* Grids */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 1.35rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(30, 41, 59, 0.9);
+    }
+
+    .card-accent-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .card-accent-cyan { background: var(--accent-cyan-light); }
+    .card-accent-emerald { background: var(--accent-emerald); }
+    .card-accent-purple { background: var(--accent-purple); }
+    .card-accent-amber { background: var(--accent-amber); }
+    .card-accent-rose { background: var(--accent-rose); }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* Metric & KPI Badges */
+    .kpi-container {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--accent-cyan-light);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .kpi-label {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .kpi-subtext {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* Pill Badges */
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .pill-cyan { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan-light); border: 1px solid rgba(6, 182, 212, 0.3); }
+    .pill-emerald { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
+    .pill-purple { background: rgba(192, 132, 252, 0.15); color: var(--accent-purple); border: 1px solid rgba(192, 132, 252, 0.3); }
+    .pill-amber { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.3); }
+    .pill-rose { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); border: 1px solid rgba(244, 63, 94, 0.3); }
+
+    /* Bullet Lists */
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .feature-list li {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      line-height: 1.5;
+    }
+
+    .feature-list li strong {
+      color: var(--text-primary);
+    }
+
+    .bullet-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-cyan-light);
+      margin-top: 0.45rem;
+      flex-shrink: 0;
+    }
+
+    /* Architecture Pipeline Flow */
+    .pipeline-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .pipeline-step {
+      display: flex;
+      align-items: stretch;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .pipeline-step-badge {
+      width: 140px;
+      background: var(--bg-elevated);
+      border-right: 1px solid var(--border-strong);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 0.75rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .pipeline-step-badge .step-number {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--accent-cyan-light);
+      font-weight: 700;
+    }
+
+    .pipeline-step-badge .step-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-top: 0.2rem;
+    }
+
+    .pipeline-step-content {
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.25rem;
+      flex: 1;
+    }
+
+    .pipeline-step-content h4 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--accent-cyan-light);
+    }
+
+    .pipeline-step-content p {
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+    }
+
+    /* Code & Terminals */
+    .code-box {
+      background: #070a12;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    /* SLO Table & Meters */
+    .slo-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .slo-table th {
+      text-align: left;
+      padding: 0.65rem 0.85rem;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .slo-table td {
+      padding: 0.75rem 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+
+    .slo-table tr:hover td {
+      background: rgba(30, 41, 59, 0.4);
+    }
+
+    .meter-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+
+    .meter-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    /* Links / Action buttons in Slide 8 */
+    .action-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.85rem 1.15rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .action-link:hover {
+      background: var(--accent-cyan);
+      color: #040812;
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+    }
+
+    /* ==========================================================================
+       BOTTOM FLOATING CONTROLLER BAR
+       ========================================================================== */
+    .controller-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70px;
+      background: rgba(11, 15, 25, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 900;
+    }
+
+    .controller-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .keyboard-hint {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    kbd {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 4px;
+      padding: 0.15rem 0.45rem;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    }
+
+    .controller-center {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .nav-btn {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      color: var(--text-primary);
+      padding: 0.55rem 1.15rem;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover:not(:disabled) {
+      background: var(--accent-cyan-light);
+      color: #040812;
+      border-color: var(--accent-cyan-light);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .nav-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .slide-counter {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      min-width: 110px;
+      text-align: center;
+      background: rgba(30, 41, 59, 0.6);
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .controller-right {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* ==========================================================================
+       OVERVIEW GRID VIEW (MODAL / OVERLAY)
+       ========================================================================== */
+    .overview-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 15, 25, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 1500;
+      display: none;
+      flex-direction: column;
+      padding: 2rem 3rem;
+      overflow-y: auto;
+    }
+
+    .overview-overlay.active {
+      display: flex;
+    }
+
+    .overview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .overview-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    .overview-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 180px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .overview-card:hover {
+      border-color: var(--accent-cyan-light);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.25);
+    }
+
+    .overview-card.current {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px var(--accent-cyan);
+    }
+
+    .overview-card-num {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-cyan-light);
+    }
+
+    .overview-card-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0.5rem 0;
+      line-height: 1.35;
+    }
+
+    .overview-card-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE BREAKPOINTS
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .deck-container {
+        max-height: none;
+        height: 100%;
+      }
+      .slide {
+        padding: 2rem 1.75rem;
+      }
+      .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-header {
+        padding: 0 1rem;
+      }
+      .exec-badge {
+        display: none;
+      }
+      .slide-viewport {
+        top: 56px;
+        bottom: 64px;
+        padding: 0.75rem;
+      }
+      .slide {
+        padding: 1.5rem 1.25rem;
+      }
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+      .controller-bar {
+        padding: 0 1rem;
+      }
+      .keyboard-hint {
+        display: none;
+      }
+      .overview-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Real-time Progress Bar -->
+  <div class="top-progress-container" role="progressbar" aria-label="Progresso da Apresentação" aria-valuenow="1" aria-valuemin="1" aria-valuemax="8">
+    <div class="top-progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <a href="../index.html" class="back-link">← Voltar para SRE Docs Hub</a>
+      <span class="exec-badge">Apresentação Estratégica • SRE Captura</span>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="icon-btn" id="btnToggleOverview" title="Atalho: Tecla ESC">
+        <span>⊞</span> Visão Geral
+      </button>
+      <button type="button" class="icon-btn" id="btnToggleFullscreen" title="Alternar Tela Cheia">
+        <span>⛶</span> Tela Cheia
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Slide Viewport -->
+  <main class="slide-viewport">
+    <div class="deck-container" id="slideDeck">
+
+      <!-- ======================================================================
+           SLIDE 1: CAPA EXECUTIVA
+           ====================================================================== -->
+      <article class="slide active" id="slide-1" data-index="1">
+        <div class="slide-header">
+          <div class="slide-eyebrow">SRE &amp; Platform Engineering • Apresentação Estratégica</div>
+          <h1 class="slide-title">SRE para Captura Física e Digital: Resiliência e Observabilidade em Escala</h1>
+          <p class="slide-subtitle">
+            Confiabilidade transacional de ponta a ponta: do terminal POS no ponto de venda aos gateways elásticos e autorizadores bancários em nuvem.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-4">
+            <div class="card">
+              <div class="card-accent-top card-accent-cyan"></div>
+              <div class="kpi-container">
+                <span class="kpi-value">99.99%</span>
+                <span class="kpi-label">Disponibilidade SLO</span>
+                <span class="kpi-subtext">Four Nines em Produção</span>
+              </div>
+              <p class="card-desc">Controle rigoroso de Error Budget com teto mensal de 4,3 minutos de indisponibilidade.</p>
+            </div>
+
+            <div class="card">
+              <div class="card-accent-top card-accent-emerald"></div>
+              <div class="kpi-container">
+                <span class="kpi-value">&lt; 220ms</span>
+                <span class="kpi-label">Latência P95 POS</span>
+                <span class="kpi-subtext">Edge TEF &amp; SmartPOS</span>
+              </div>
+              <p class="card-desc">Resposta instantânea no ponto de venda garantindo fluidez e zero atrito no checkout físico.</p>
+            </div>
+
+            <div class="card">
+              <div class="card-accent-top card-accent-purple"></div>
+              <div class="kpi-container">
+                <span class="kpi-value">&lt; 800ms</span>
+                <span class="kpi-label">Latência P99 Digital</span>
+                <span class="kpi-subtext">Gateway E-commerce</span>
+              </div>
+              <p class="card-desc">Execução paralela de Antifraude assíncrono, autenticação 3DS 2.0 e tokenização PCI.</p>
+            </div>
+
+            <div class="card">
+              <div class="card-accent-top card-accent-amber"></div>
+              <div class="kpi-container">
+                <span class="kpi-value">18.5k</span>
+                <span class="kpi-label">Pico TPS</span>
+                <span class="kpi-subtext">Black Friday Ready</span>
+              </div>
+              <p class="card-desc">Capacidade elástica testada com Chaos Mesh e autoscaling proativo em clusters AKS.</p>
+            </div>
+          </div>
+
+          <div class="card" style="background: rgba(15, 23, 42, 0.65);">
+            <div class="card-title">
+              <span class="badge-pill pill-cyan">PILAR SRE</span>
+              Diretrizes de Excelência Operacional para Meios de Pagamento
+            </div>
+            <p class="card-desc">
+              Esta apresentação estabelece os padrões técnicos adotados pela equipe de SRE para assegurar que cada transação de débito, crédito ou Pix seja processada com idempotência absoluta, rastreabilidade distribuída via Dynatrace e failover automático multi-adquirente em milissegundos.
+            </p>
+          </div>
+        </div>
+
+        <div class="slide-footer-note">
+          <span>SRE Documentation Hub • Captura Física e Digital</span>
+          <span>Slide 1 / 8</span>
+        </div>
+      </article>
+
+      <!-- ======================================================================
+           SLIDE 2: PANORAMA DO ECOSSISTEMA (FÍSICA VS DIGITAL)
+           ====================================================================== -->
+      <article class="slide" id="slide-2" data-index="2">
+        <div class="slide-header">
+          <div class="slide-eyebrow">Mapeamento de Domínio • Captura Transacional</div>
+          <h2 class="slide-title">Panorama do Ecossistema: Captura Física vs Captura Digital</h2>
+          <p class="slide-subtitle">
+            Duas realidades operacionais com desafios de engenharia complementares operadas sob a mesma governança de SRE.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-2">
+            <!-- Física -->
+            <div class="card">
+              <div class="card-accent-top card-accent-cyan"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-cyan">BORDA &amp; VAREJO</span>
+                Captura Física (In-Store)
+              </div>
+              <ul class="feature-list">
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Dispositivos de Borda:</strong> Terminais autônomos SmartPOS (Android/Linux embarcado) e PIN Pads legados com teclado blindado.</span>
+                </li>
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Concentradores TEF:</strong> Protocolos dedicados SiTef (Software Express), Linx TEF e D-TEF com dial-up, IP e VPN dedicada em lojas.</span>
+                </li>
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Criptografia &amp; Segurança:</strong> Transações com chip EMV, Contactless (NFC) e gerenciamento de chaves DUKPT/MasterSession (PCI-PTS).</span>
+                </li>
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Desafios de Conectividade:</strong> Degradação de sinal 4G/5G, jitter de Wi-Fi e concorrência com tráfego de loja.</span>
+                </li>
+              </ul>
+            </div>
+
+            <!-- Digital -->
+            <div class="card">
+              <div class="card-accent-top card-accent-purple"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-purple">CLOUD &amp; E-COMMERCE</span>
+                Captura Digital (Online / App)
+              </div>
+              <ul class="feature-list">
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Gateways &amp; APIs:</strong> Endpoints RESTful e gRPC para checkouts web transparentes e SDKs nativos iOS/Android.</span>
+                </li>
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Autenticação 3DS 2.0:</strong> Análise de risco em tempo real integrada aos emissores, com autenticação biométrica silenciosa.</span>
+                </li>
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Motores Antifraude:</strong> Scoring síncrono com ClearSale e Cybersource com thresholding adaptativo e machine learning.</span>
+                </li>
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Tokenização PCI-DSS:</strong> Cofres virtuais de cartões (Card-on-File) e Network Tokens Visa/Mastercard para recorrência segura.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card" style="background: rgba(15, 23, 42, 0.7); border-color: rgba(6, 182, 212, 0.3);">
+            <div class="card-desc" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+              <span><strong>Diferencial SRE:</strong> Enquanto a Física exige tolerância extrema a redes instáveis e timeouts em rádio celular, a Digital demanda proteção contra ataques volumétricos de bots (card testing) e escalabilidade elástica instantânea.</span>
+              <span class="badge-pill pill-emerald" style="flex-shrink: 0;">Arquitetura Unificada</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-footer-note">
+          <span>SRE Documentation Hub • Captura Física e Digital</span>
+          <span>Slide 2 / 8</span>
+        </div>
+      </article>
+
+      <!-- ======================================================================
+           SLIDE 3: TOPOLOGIA & ARQUITETURA END-TO-END
+           ====================================================================== -->
+      <article class="slide" id="slide-3" data-index="3">
+        <div class="slide-header">
+          <div class="slide-eyebrow">Arquitetura de Microsserviços &amp; Perímetro</div>
+          <h2 class="slide-title">Topologia &amp; Arquitetura End-to-End da Transação</h2>
+          <p class="slide-subtitle">
+            Caminho crítico percorrido pela autorização transacional desde a borda até as adquirentes e o Banco Central.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="pipeline-wrapper">
+            <!-- Step 1 -->
+            <div class="pipeline-step">
+              <div class="pipeline-step-badge">
+                <span class="step-number">CAMADA 1</span>
+                <span class="step-name">Terminais &amp; Borda</span>
+              </div>
+              <div class="pipeline-step-content">
+                <h4>SmartPOS, Concentradores TEF &amp; SDKs Mobile</h4>
+                <p>Captura da carga criptografada EMV/NFC ou dados tokenizados no checkout mobile. Aplicação de idempotency-key no cliente.</p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="pipeline-step">
+              <div class="pipeline-step-badge">
+                <span class="step-number">CAMADA 2</span>
+                <span class="step-name">Edge Ingress &amp; WAF</span>
+              </div>
+              <div class="pipeline-step-content">
+                <h4>Azure Application Gateway, WAF &amp; Envoy Ingress</h4>
+                <p>Terminação TLS 1.3, Rate Limiting baseado em reputação de IP, mitigação distribuída de DDoS e validação de schema JSON/mTLS.</p>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="pipeline-step">
+              <div class="pipeline-step-badge">
+                <span class="step-number">CAMADA 3</span>
+                <span class="step-name">Core Transacional</span>
+              </div>
+              <div class="pipeline-step-content">
+                <h4>Cluster AKS (aks-split-bra-prd) &amp; Microsserviços Go/Rust</h4>
+                <p>Switching de rotas, cofre de tokenização PCI, proxy antifraude de baixa latência e persistência em Ledger particionado via Apache Kafka.</p>
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="pipeline-step">
+              <div class="pipeline-step-badge">
+                <span class="step-number">CAMADA 4</span>
+                <span class="step-name">Upstream Parceiros</span>
+              </div>
+              <div class="pipeline-step-content">
+                <h4>Adquirentes (Cielo, Rede, Stone), Bandeiras &amp; SPI BACEN (Pix)</h4>
+                <p>Conexões privadas Azure ExpressRoute com túneis IPsec redundantes. Circuit breakers ativos monitorando latência e códigos ISO 8583.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-footer-note">
+          <span>SRE Documentation Hub • Captura Física e Digital</span>
+          <span>Slide 3 / 8</span>
+        </div>
+      </article>
+
+      <!-- ======================================================================
+           SLIDE 4: SLIS, SLOS & ERROR BUDGETS
+           ====================================================================== -->
+      <article class="slide" id="slide-4" data-index="4">
+        <div class="slide-header">
+          <div class="slide-eyebrow">Confiabilidade Mensurável • Governança SRE</div>
+          <h2 class="slide-title">SLIs, SLOs &amp; Error Budgets em Pagamentos</h2>
+          <p class="slide-subtitle">
+            Métricas de nível de serviço com tolerâncias rígidas e políticas de congelamento automático baseadas em burn rate.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <table class="slo-table">
+            <thead>
+              <tr>
+                <th>Indicador de Serviço (SLI)</th>
+                <th>Objetivo (SLO)</th>
+                <th>Error Budget Mensal</th>
+                <th>Ação ao Queimar Budget</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Disponibilidade de Autorização</strong><br>
+                  <small style="color: var(--text-muted); font-family: var(--font-mono);">Transações válidas com resposta HTTP 2xx / ISO 00</small>
+                </td>
+                <td><span class="badge-pill pill-emerald">99.99%</span></td>
+                <td>
+                  <strong>4,32 minutos</strong>
+                  <div class="meter-bar"><div class="meter-fill" style="width: 10%; background: var(--accent-emerald);"></div></div>
+                </td>
+                <td>Code Freeze imediato e acionamento de SEV-1 War Room.</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Latência P95 em Captura Física</strong><br>
+                  <small style="color: var(--text-muted); font-family: var(--font-mono);">Tempo de resposta ponta a ponta no terminal POS</small>
+                </td>
+                <td><span class="badge-pill pill-cyan">&lt; 220ms</span></td>
+                <td>
+                  <strong>P99 &lt; 500ms</strong>
+                  <div class="meter-bar"><div class="meter-fill" style="width: 25%; background: var(--accent-cyan-light);"></div></div>
+                </td>
+                <td>Chaveamento de rota para adquirente secundária mais veloz.</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Latência P99 em Captura Digital</strong><br>
+                  <small style="color: var(--text-muted); font-family: var(--font-mono);">Tempo total com 3DS 2.0 e Antifraude síncrono</small>
+                </td>
+                <td><span class="badge-pill pill-purple">&lt; 800ms</span></td>
+                <td>
+                  <strong>Timeout em 1200ms</strong>
+                  <div class="meter-bar"><div class="meter-fill" style="width: 30%; background: var(--accent-purple);"></div></div>
+                </td>
+                <td>Bypass gracioso de enriquecimento não essencial.</td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Technical Success Rate (TSR)</strong><br>
+                  <small style="color: var(--text-muted); font-family: var(--font-mono);">Exclui recusas do cliente (saldo, senha inválida)</small>
+                </td>
+                <td><span class="badge-pill pill-amber">&gt; 99.95%</span></td>
+                <td>
+                  <strong>0.05% de falhas técnicas</strong>
+                  <div class="meter-bar"><div class="meter-fill" style="width: 15%; background: var(--accent-amber);"></div></div>
+                </td>
+                <td>Isolamento do nó/pod no cluster AKS e drenagem de tráfego.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="grid-2">
+            <div class="card" style="padding: 1rem 1.25rem;">
+              <div class="card-title" style="font-size: 0.92rem;">
+                <span class="badge-pill pill-rose">POLÍTICA 1H BURN</span>
+                Consumo &gt; 20% do Budget em 1 hora
+              </div>
+              <p class="card-desc" style="font-size: 0.84rem;">
+                Bloqueio automático de pipelines de release no Azure DevOps e abertura instantânea de incidente PagerDuty para o SRE on-call.
+              </p>
+            </div>
+            <div class="card" style="padding: 1rem 1.25rem;">
+              <div class="card-title" style="font-size: 0.92rem;">
+                <span class="badge-pill pill-amber">POLÍTICA 24H BURN</span>
+                Consumo &gt; 50% do Budget em 24 horas
+              </div>
+              <p class="card-desc" style="font-size: 0.84rem;">
+                Direcionamento de 100% dos squads de produto para tarefas exclusivas de resiliência, profiling de performance e redução de débitos técnicos.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-footer-note">
+          <span>SRE Documentation Hub • Captura Física e Digital</span>
+          <span>Slide 4 / 8</span>
+        </div>
+      </article>
+
+      <!-- ======================================================================
+           SLIDE 5: OBSERVABILIDADE HOLÍSTICA COM DYNATRACE
+           ====================================================================== -->
+      <article class="slide" id="slide-5" data-index="5">
+        <div class="slide-header">
+          <div class="slide-eyebrow">APM &amp; Inteligência Operacional</div>
+          <h2 class="slide-title">Observabilidade Holística com Dynatrace &amp; Davis AI</h2>
+          <p class="slide-subtitle">
+            Monitoramento full-stack unificando telemetria de terminais POS, pods AKS e conexões de rede com adquirentes.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-3">
+            <!-- Golden Signals -->
+            <div class="card">
+              <div class="card-accent-top card-accent-cyan"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-cyan">TELEMETRIA</span>
+                Golden Signals em Pagamentos
+              </div>
+              <ul class="feature-list" style="gap: 0.45rem;">
+                <li><span class="bullet-dot"></span><span><strong>Latência:</strong> Tempo de autorização segmentado por adquirente e bandeira.</span></li>
+                <li><span class="bullet-dot"></span><span><strong>Tráfego:</strong> TPS transacional e TPV financeiro por canal (POS/Digital).</span></li>
+                <li><span class="bullet-dot"></span><span><strong>Erros:</strong> Códigos 5xx, timeouts TCP e ISO 8583 (91 - Emissor fora, 96 - Erro sistema).</span></li>
+                <li><span class="bullet-dot"></span><span><strong>Saturação:</strong> Threads de worker, CPU throttling e conexões de pool PostgreSQL.</span></li>
+              </ul>
+            </div>
+
+            <!-- Distributed Tracing -->
+            <div class="card">
+              <div class="card-accent-top card-accent-purple"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-purple">RASTREAMENTO</span>
+                Tracing com Contexto de Negócio
+              </div>
+              <p class="card-desc">
+                Propagação transparente de W3C TraceContext correlacionando atributos transacionais para diagnóstico em segundos:
+              </p>
+              <div class="code-box">
+                trace_id: 4bf92f3577b34da6a3ce929d0e0e4736<br>
+                terminal_id: "POS-BR-SP-4491"<br>
+                nsu: "89341209"<br>
+                acquirer_route: "CIELO_PRIMARY"<br>
+                latency_ms: 184
+              </div>
+            </div>
+
+            <!-- Davis AI -->
+            <div class="card">
+              <div class="card-accent-top card-accent-emerald"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-emerald">IA CAUSAL</span>
+                Davis AI &amp; Baselines Preditivos
+              </div>
+              <ul class="feature-list" style="gap: 0.45rem;">
+                <li><span class="bullet-dot"></span><span><strong>Baselines Adaptativos:</strong> Aprendizado automático de sazonalidade horária e diária sem alertas falsos.</span></li>
+                <li><span class="bullet-dot"></span><span><strong>Root Cause Analysis:</strong> Identifica instantaneamente se a falha está no pod AKS ou na adquirente externa.</span></li>
+                <li><span class="bullet-dot"></span><span><strong>Integração OneAgent:</strong> Instrumentação automática nos nós do cluster <code>aks-split-bra-prd</code>.</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card" style="background: rgba(15, 23, 42, 0.65);">
+            <div class="card-desc" style="display: flex; align-items: center; justify-content: space-between;">
+              <span><strong>Padrão Documentado:</strong> O processo completo de instalação e governança do Dynatrace Operator está padronizado no Procedimento Operacional <code>POP-OBS-014</code>.</span>
+              <a href="../procedimentos/procedimento-onboarding-dynatrace.html" class="badge-pill pill-cyan" style="text-decoration: none;">Ver POP-OBS-014 →</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-footer-note">
+          <span>SRE Documentation Hub • Captura Física e Digital</span>
+          <span>Slide 5 / 8</span>
+        </div>
+      </article>
+
+      <!-- ======================================================================
+           SLIDE 6: ENGENHARIA DE RESILIÊNCIA & CIRCUIT BREAKERS
+           ====================================================================== -->
+      <article class="slide" id="slide-6" data-index="6">
+        <div class="slide-header">
+          <div class="slide-eyebrow">Arquitetura Tolerante a Falhas • Alta Disponibilidade</div>
+          <h2 class="slide-title">Engenharia de Resiliência &amp; Circuit Breakers</h2>
+          <p class="slide-subtitle">
+            Mecanismos automáticos para conter degradações de adquirentes externas sem impactar a experiência de compra do cliente.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-accent-top card-accent-rose"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-rose">ROTEAMENTO</span>
+                Circuit Breaker Multi-Adquirente
+              </div>
+              <p class="card-desc">
+                Se uma adquirente apresentar latência P95 &gt; 1200ms ou taxa de erro técnico &gt; 2.5% em 30 segundos:
+              </p>
+              <ul class="feature-list" style="margin-top: 0.5rem;">
+                <li><span class="bullet-dot"></span><span>Chaveamento automático em <strong>&lt; 180ms</strong>.</span></li>
+                <li><span class="bullet-dot"></span><span>Tráfego desviado para adquirente de contingência.</span></li>
+                <li><span class="bullet-dot"></span><span>Tentativas em Half-Open periódicas para auto-remediação.</span></li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <div class="card-accent-top card-accent-cyan"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-cyan">INTEGRIDADE</span>
+                Idempotência &amp; Anti-Duplicação
+              </div>
+              <p class="card-desc">
+                Garantia estrita de que retentativas de rede causadas por timeouts não ocasionem cobranças repetidas:
+              </p>
+              <ul class="feature-list" style="margin-top: 0.5rem;">
+                <li><span class="bullet-dot"></span><span>Chave de idempotência baseada no hash da transação.</span></li>
+                <li><span class="bullet-dot"></span><span>Lock distribuído em memória Redis Cluster (TTL 60s).</span></li>
+                <li><span class="bullet-dot"></span><span>Reconhecimento de transação idêntica com retorno cached.</span></li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <div class="card-accent-top card-accent-amber"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-amber">CONTAINMENT</span>
+                Degradação Graciosa (Graceful)
+              </div>
+              <p class="card-desc">
+                Proteção do core transacional durante saturação extrema ou picos imprevistos de tráfego:
+              </p>
+              <ul class="feature-list" style="margin-top: 0.5rem;">
+                <li><span class="bullet-dot"></span><span>Bypass de serviços periféricos (analytics, webhooks).</span></li>
+                <li><span class="bullet-dot"></span><span>Antifraude assíncrono pós-autorização em baixo risco.</span></li>
+                <li><span class="bullet-dot"></span><span>Isolamento garantido de CPU para o pipeline financeiro.</span></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card" style="background: rgba(15, 23, 42, 0.7);">
+            <div class="card-title" style="font-size: 0.95rem;">
+              <span class="badge-pill pill-emerald">RESULTADO COMPROVADO</span>
+              Recapacity &amp; Eliminação de OOMKill no Cluster Crítico
+            </div>
+            <p class="card-desc">
+              A implementação de HPA agressivo baseado em métricas de negócio e redimensionamento de memória eliminou 100% dos eventos Exit Code 137 durante a Black Friday no cluster <code>aks-split-bra-prd</code>.
+            </p>
+          </div>
+        </div>
+
+        <div class="slide-footer-note">
+          <span>SRE Documentation Hub • Captura Física e Digital</span>
+          <span>Slide 6 / 8</span>
+        </div>
+      </article>
+
+      <!-- ======================================================================
+           SLIDE 7: GESTÃO DE INCIDENTES & WAR ROOM
+           ====================================================================== -->
+      <article class="slide" id="slide-7" data-index="7">
+        <div class="slide-header">
+          <div class="slide-eyebrow">Operação Crítica • Prontidão para Black Friday</div>
+          <h2 class="slide-title">Gestão de Incidentes &amp; War Room de Alta Disponibilidade</h2>
+          <p class="slide-subtitle">
+            Estrutura de comando de incidentes com escalonamento ágil, planos de contingência pré-homologados e runbooks executáveis.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-2">
+            <!-- Matriz de Severidade -->
+            <div class="card">
+              <div class="card-accent-top card-accent-rose"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-rose">SLA DE RESPOSTA</span>
+                Matriz de Severidade &amp; Escalonamento
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <div style="padding: 0.65rem 0.85rem; background: rgba(244, 63, 94, 0.08); border-left: 3px solid var(--accent-rose); border-radius: 4px;">
+                  <strong style="color: var(--accent-rose); font-size: 0.88rem;">SEV-1 (Crítico) • Resposta &lt; 5 min</strong>
+                  <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">Queda de autorização &gt; 1% ou indisponibilidade total de Pix/Crédito. Disparo automático no PagerDuty e abertura da War Room.</p>
+                </div>
+                <div style="padding: 0.65rem 0.85rem; background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--accent-amber); border-radius: 4px;">
+                  <strong style="color: var(--accent-amber); font-size: 0.88rem;">SEV-2 (Alto) • Resposta &lt; 15 min</strong>
+                  <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">Latência P95 &gt; 500ms ou saturação de pods acima de 85%. Envolvimento do SRE primário e squad responsável.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Black Friday Readiness -->
+            <div class="card">
+              <div class="card-accent-top card-accent-cyan"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-cyan">READINESS</span>
+                Preparação para Eventos de Pico
+              </div>
+              <ul class="feature-list">
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Stress Testing &amp; Capacity:</strong> Simulações prévias para 5x o volume regular de transações por segundo.</span>
+                </li>
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Code Freeze Rigoroso:</strong> Congelamento de deploys não emergenciais 15 dias antes das principais datas do varejo.</span>
+                </li>
+                <li>
+                  <span class="bullet-dot"></span>
+                  <span><strong>Feature Flags Dinâmicas:</strong> Isolamento imediato de adquirentes instáveis em menos de 10 segundos via Unleash/LaunchDarkly.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="card" style="background: rgba(15, 23, 42, 0.7); border-color: rgba(16, 185, 129, 0.3);">
+            <div class="card-desc" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+              <span><strong>Runbooks Padronizados:</strong> Diagnósticos sistemáticos de contenção de OOMKill e falhas de nós K8s documentados no Hub evitam adivinhações em situações de alta pressão.</span>
+              <a href="../runbooks/runbook-mitigacao-oomkill-aks.html" class="badge-pill pill-emerald" style="text-decoration: none; flex-shrink: 0;">Acessar Runbook OOMKill →</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-footer-note">
+          <span>SRE Documentation Hub • Captura Física e Digital</span>
+          <span>Slide 7 / 8</span>
+        </div>
+      </article>
+
+      <!-- ======================================================================
+           SLIDE 8: CONCLUSÃO & ROADMAP ESTRATÉGICO
+           ====================================================================== -->
+      <article class="slide" id="slide-8" data-index="8">
+        <div class="slide-header">
+          <div class="slide-eyebrow">Roadmap de Engenharia • Visão de Futuro</div>
+          <h2 class="slide-title">Conclusão &amp; Roadmap Estratégico de SRE</h2>
+          <p class="slide-subtitle">
+            Pilares de evolução contínua para consolidar a confiabilidade transacional e a maturidade de observabilidade.
+          </p>
+        </div>
+
+        <div class="slide-body">
+          <div class="grid-3">
+            <div class="card">
+              <div class="card-accent-top card-accent-cyan"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-cyan">FASE 1</span>
+                Chaos Engineering
+              </div>
+              <p class="card-desc">
+                Injeção contínua de falhas automatizadas via <strong>Chaos Mesh</strong> em produção: simulação de corte de rotas de adquirentes, partição de rede no Kafka e latência artificial de rádio nos POS.
+              </p>
+            </div>
+
+            <div class="card">
+              <div class="card-accent-top card-accent-purple"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-purple">FASE 2</span>
+                Auto-Remediação KEDA
+              </div>
+              <p class="card-desc">
+                Remediação orientada a eventos vinculando Davis AI a playbooks de auto-scaling reativo via <strong>KEDA</strong> e reinício gracioso de pods degradados antes da violação do SLO.
+              </p>
+            </div>
+
+            <div class="card">
+              <div class="card-accent-top card-accent-emerald"></div>
+              <div class="card-title">
+                <span class="badge-pill pill-emerald">FASE 3</span>
+                FinOps em Tempo Real
+              </div>
+              <p class="card-desc">
+                Monitoramento do custo de infraestrutura por transação autorizada (Unit Economics), garantindo eficiência financeira da nuvem sem comprometer a redundância.
+              </p>
+            </div>
+          </div>
+
+          <div class="card" style="background: rgba(15, 23, 42, 0.85); border-color: rgba(56, 189, 248, 0.4);">
+            <div class="card-title" style="margin-bottom: 0.25rem;">
+              <span>Recursos Vinculados no SRE Documentation Hub</span>
+            </div>
+            <div class="grid-3" style="margin-top: 0.5rem;">
+              <a href="../index.html" class="action-link">
+                <span>Portal Principal (Hub)</span>
+                <span>→</span>
+              </a>
+              <a href="../arquiteturas/relatorio-melhorias-recapacity-split.html" class="action-link">
+                <span>Relatório Recapacity</span>
+                <span>→</span>
+              </a>
+              <a href="../runbooks/runbook-mitigacao-oomkill-aks.html" class="action-link">
+                <span>Runbook Mitigação OOMKill</span>
+                <span>→</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-footer-note">
+          <span>SRE Documentation Hub • Captura Física e Digital</span>
+          <span>Slide 8 / 8</span>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer class="controller-bar">
+    <div class="controller-left">
+      <div class="keyboard-hint">
+        Navegar: <kbd>→</kbd> <kbd>←</kbd> <kbd>Espaço</kbd> | Visão Geral: <kbd>Esc</kbd>
+      </div>
+    </div>
+
+    <div class="controller-center">
+      <button type="button" class="nav-btn" id="btnPrev" aria-label="Slide Anterior" disabled>
+        <span>‹</span> Anterior
+      </button>
+
+      <div class="slide-counter" id="slideCounterDisplay" aria-live="polite">
+        Slide 1 de 8
+      </div>
+
+      <button type="button" class="nav-btn" id="btnNext" aria-label="Próximo Slide">
+        Próximo <span>›</span>
+      </button>
+    </div>
+
+    <div class="controller-right">
+      <span class="badge-pill pill-emerald" style="font-size: 0.75rem;">Modo Standalone</span>
+    </div>
+  </footer>
+
+  <!-- Overview Grid Modal -->
+  <div class="overview-overlay" id="overviewOverlay" role="dialog" aria-modal="true" aria-label="Visão Geral dos Slides">
+    <div class="overview-header">
+      <div class="overview-title">
+        <span>⊞</span> Visão Geral da Apresentação
+      </div>
+      <button type="button" class="icon-btn" id="btnCloseOverview">
+        Fechar (Esc) ✕
+      </button>
+    </div>
+
+    <div class="overview-grid" id="overviewGrid">
+      <!-- Injected via JavaScript dynamically -->
+    </div>
+  </div>
+
+  <!-- Standalone Vanilla Slide Controller Script -->
+  <script>
+    (function () {
+      'use strict';
+
+      // State
+      let currentIndex = 0;
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const totalSlides = slides.length;
+
+      // DOM Elements
+      const progressBar = document.getElementById('progressBar');
+      const counterDisplay = document.getElementById('slideCounterDisplay');
+      const btnPrev = document.getElementById('btnPrev');
+      const btnNext = document.getElementById('btnNext');
+      const btnToggleOverview = document.getElementById('btnToggleOverview');
+      const btnCloseOverview = document.getElementById('btnCloseOverview');
+      const btnToggleFullscreen = document.getElementById('btnToggleFullscreen');
+      const overviewOverlay = document.getElementById('overviewOverlay');
+      const overviewGrid = document.getElementById('overviewGrid');
+
+      // Build Overview Grid Cards
+      function populateOverviewGrid() {
+        overviewGrid.innerHTML = '';
+        slides.forEach((slide, idx) => {
+          const title = slide.querySelector('.slide-title')?.textContent || `Slide ${idx + 1}`;
+          const eyebrow = slide.querySelector('.slide-eyebrow')?.textContent || '';
+          const subtitle = slide.querySelector('.slide-subtitle')?.textContent || '';
+
+          const card = document.createElement('div');
+          card.className = `overview-card ${idx === currentIndex ? 'current' : ''}`;
+          card.setAttribute('role', 'button');
+          card.setAttribute('tabindex', '0');
+          card.innerHTML = `
+            <div>
+              <span class="overview-card-num">SLIDE ${idx + 1} DE ${totalSlides}</span>
+              <h3 class="overview-card-title">${title}</h3>
+            </div>
+            <p class="overview-card-desc">${subtitle.slice(0, 100)}...</p>
+          `;
+
+          const selectThisSlide = () => {
+            goToSlide(idx);
+            closeOverview();
+          };
+
+          card.addEventListener('click', selectThisSlide);
+          card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              selectThisSlide();
+            }
+          });
+
+          overviewGrid.appendChild(card);
+        });
+      }
+
+      // Slide Navigation Core
+      function goToSlide(targetIndex) {
+        if (targetIndex < 0 || targetIndex >= totalSlides) return;
+
+        slides.forEach((slide, idx) => {
+          slide.classList.remove('active', 'past');
+          if (idx < targetIndex) {
+            slide.classList.add('past');
+          } else if (idx === targetIndex) {
+            slide.classList.add('active');
+          }
+        });
+
+        currentIndex = targetIndex;
+
+        // Update Controller UI
+        counterDisplay.textContent = `Slide ${currentIndex + 1} de ${totalSlides}`;
+        btnPrev.disabled = currentIndex === 0;
+        btnNext.disabled = currentIndex === totalSlides - 1;
+
+        // Update Progress Bar
+        const progressPercent = ((currentIndex + 1) / totalSlides) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+        const progressContainer = document.querySelector('.top-progress-container');
+        if (progressContainer) {
+          progressContainer.setAttribute('aria-valuenow', currentIndex + 1);
+        }
+
+        // Keep hash in URL for deep linking
+        window.location.hash = `slide-${currentIndex + 1}`;
+      }
+
+      function nextSlide() {
+        if (currentIndex < totalSlides - 1) {
+          goToSlide(currentIndex + 1);
+        }
+      }
+
+      function prevSlide() {
+        if (currentIndex > 0) {
+          goToSlide(currentIndex - 1);
+        }
+      }
+
+      // Overview Toggle
+      function openOverview() {
+        populateOverviewGrid();
+        overviewOverlay.classList.add('active');
+      }
+
+      function closeOverview() {
+        overviewOverlay.classList.remove('active');
+      }
+
+      function toggleOverview() {
+        if (overviewOverlay.classList.contains('active')) {
+          closeOverview();
+        } else {
+          openOverview();
+        }
+      }
+
+      // Fullscreen Toggle
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+          }
+        }
+      }
+
+      // Event Listeners
+      btnNext.addEventListener('click', nextSlide);
+      btnPrev.addEventListener('click', prevSlide);
+      btnToggleOverview.addEventListener('click', toggleOverview);
+      btnCloseOverview.addEventListener('click', closeOverview);
+      btnToggleFullscreen.addEventListener('click', toggleFullscreen);
+
+      // Keyboard Controls
+      window.addEventListener('keydown', (e) => {
+        // Escape closes overview or toggles it
+        if (e.key === 'Escape') {
+          toggleOverview();
+          return;
+        }
+
+        // If overview is open, allow closing or arrow navigation inside modal
+        if (overviewOverlay.classList.contains('active')) {
+          return;
+        }
+
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+          e.preventDefault();
+          nextSlide();
+        } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+          e.preventDefault();
+          prevSlide();
+        } else if (e.key === 'Home') {
+          e.preventDefault();
+          goToSlide(0);
+        } else if (e.key === 'End') {
+          e.preventDefault();
+          goToSlide(totalSlides - 1);
+        } else if (e.key === 'g' || e.key === 'G') {
+          e.preventDefault();
+          toggleOverview();
+        } else if (e.key === 'f' || e.key === 'F') {
+          e.preventDefault();
+          toggleFullscreen();
+        }
+      });
+
+      // Swipe navigation for touch screens
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      window.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
+
+      window.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      }, { passive: true });
+
+      function handleSwipe() {
+        const swipeDistance = touchEndX - touchStartX;
+        if (Math.abs(swipeDistance) > 50) {
+          if (swipeDistance < 0) {
+            nextSlide();
+          } else {
+            prevSlide();
+          }
+        }
+      }
+
+      // Initialize from Hash or default to 0
+      const initialHash = window.location.hash.match(/^#slide-(\d+)$/);
+      if (initialHash) {
+        const slideNum = parseInt(initialHash[1], 10);
+        if (slideNum >= 1 && slideNum <= totalSlides) {
+          goToSlide(slideNum - 1);
+        } else {
+          goToSlide(0);
+        }
+      } else {
+        goToSlide(0);
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procedimento Operacional: Onboarding de Clusters AKS no Dynatrace</title>
+  <meta name="description" content="Guia padrão de engenharia para instrumentação full-stack de clusters AKS via Dynatrace Operator, padronização de tags FinOps/SRE e validação de alertas Davis AI.">
+  <meta name="tags" content="Dynatrace, Observability, AKS, Procedimento, Onboarding, OneAgent, SRE">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-surface: #111827;
+      --bg-elevated: #1e293b;
+      --border-subtle: #1f2937;
+      --border-strong: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-cyan: #06b6d4;
+      --accent-cyan-light: #38bdf8;
+      --accent-emerald: #10b981;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .back-link {
+      color: var(--accent-cyan-light);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+    }
+
+    .status-badge {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.3rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .header-card {
+      background: linear-gradient(145deg, var(--bg-surface), rgba(30, 41, 59, 0.7));
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      color: var(--accent-cyan-light);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.45rem;
+    }
+
+    h1 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.65rem;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 0.96rem;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.35rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: var(--text-primary);
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      margin-bottom: 0.85rem;
+    }
+
+    pre {
+      background: #070a12;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 1rem 1.15rem;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      color: #e2e8f0;
+      margin-top: 0.5rem;
+    }
+
+    .checklist {
+      list-style: none;
+      display: grid;
+      gap: 0.65rem;
+      margin-top: 0.75rem;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      padding: 0.65rem 0.95rem;
+      border-radius: 8px;
+    }
+
+    .check-icon {
+      color: var(--accent-emerald);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <a href="../index.html" class="back-link">← Voltar para SRE Docs Hub</a>
+      <span class="status-badge">POP-OBS-014 • PADRÃO OFICIAL SRE</span>
+    </div>
+
+    <header class="header-card">
+      <div class="eyebrow">Procedimento Operacional Padrão • Observabilidade</div>
+      <h1>Onboarding de Clusters AKS e Workloads no Dynatrace</h1>
+      <p class="subtitle">
+        Guia padronizado para implantação do <strong>Dynatrace Operator (DynaKube)</strong> em modo <code>cloudNativeFullStack</code>, taxonomia obrigatória de labels Kubernetes e ativação de alertas de anomalia (CPU Throttling, OOMKill e SLOs).
+      </p>
+    </header>
+
+    <section class="card">
+      <h2>1. Pré-requisitos e Criação de Tokens na Tenant Dynatrace</h2>
+      <p>Gere os tokens no cofre corporativo (Azure Key Vault) e sincronize via External Secrets Operator no namespace <code>dynatrace</code>:</p>
+      <pre><code>kubectl create namespace dynatrace
+
+kubectl -n dynatrace create secret generic dynakube \
+  --from-literal="apiToken=${DT_OPERATOR_TOKEN}" \
+  --from-literal="dataIngestToken=${DT_INGEST_TOKEN}"</code></pre>
+    </section>
+
+    <section class="card">
+      <h2>2. Aplicação do Manifesto DynaKube (Cloud-Native Full-Stack)</h2>
+      <p>Configure o manifesto garantindo coleta de métricas do Kubernetes API via ActiveGate e injeção seletiva nos namespaces de negócio:</p>
+      <pre><code>apiVersion: dynatrace.com/v1beta2
+kind: DynaKube
+metadata:
+  name: aks-split-bra-prd
+  namespace: dynatrace
+spec:
+  apiUrl: https://&lt;tenant-id&gt;.live.dynatrace.com/api
+  oneAgent:
+    cloudNativeFullStack:
+      tolerations:
+        - effect: NoSchedule
+          key: kubernetes.io/arch
+          value: amd64
+  activeGate:
+    capabilities:
+      - kubernetes-monitoring
+      - routing
+      - metrics-ingest</code></pre>
+    </section>
+
+    <section class="card">
+      <h2>3. Checklist de Validação Pós-Onboarding</h2>
+      <ul class="checklist">
+        <li><span class="check-icon">✓</span> Todos os pods <code>dynakube-oneagent</code> e <code>dynakube-activegate</code> em status <code>Running (1/1)</code>.</li>
+        <li><span class="check-icon">✓</span> Cluster visível no menu <strong>Kubernetes Workloads</strong> do Dynatrace com eventos e métricas de CFS Throttling ativos.</li>
+        <li><span class="check-icon">✓</span> Tags obrigatórias <code>dt.owner</code>, <code>dt.costcenter</code> e <code>dt.tier</code> propagadas automaticamente a partir das labels dos Deployments.</li>
+        <li><span class="check-icon">✓</span> Alerting Profile vinculado ao canal de plantão SRE (PagerDuty / Microsoft Teams).</li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>
