@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Runbook de Teste: Latência Alta no Autorizador TEF / POS</title>
+  <meta name="description" content="Runbook de validação da automação do GitHub Actions para triagem rápida de degradação e timeout nas transações de Captura Física (POS/TEF).">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-primary: #0b0f19;
+      --bg-surface: #111827;
+      --border-subtle: #1f2937;
+      --border-strong: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-cyan: #38bdf8;
+      --accent-emerald: #10b981;
+    }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      padding: 2.5rem 1.5rem;
+    }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .back-link {
+      color: var(--accent-cyan);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-bottom: 1.5rem;
+    }
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .badge {
+      display: inline-block;
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+    }
+    h1 {
+      font-size: 1.65rem;
+      margin: 0 0 0.5rem;
+    }
+    h2 {
+      font-size: 1.1rem;
+      margin: 0 0 0.5rem;
+      color: var(--accent-cyan);
+    }
+    p {
+      color: var(--text-secondary);
+      margin: 0 0 0.75rem;
+    }
+    pre {
+      background: #070a12;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      padding: 0.9rem 1rem;
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="../index.html" class="back-link">← Voltar ao Documentation Hub</a>
+
+    <div class="card">
+      <span class="badge">TESTE GITHUB ACTIONS • CAPTURA FÍSICA</span>
+      <h1>Runbook: Latência Alta no Autorizador TEF / POS</h1>
+      <p>
+        Documento simples criado para validar a indexação automática via GitHub Actions sem alterar manualmente o arquivo <code>docs.json</code>.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>1. Verificar Saúde dos Pods do Gateway TEF</h2>
+      <p>Checar latência e status das réplicas no namespace produtivo de captura física:</p>
+      <pre><code>kubectl get pods -n captura-fisica-prd -l app=tef-authorizer-gateway
+kubectl top pods -n captura-fisica-prd -l app=tef-authorizer-gateway</code></pre>
+    </div>
+
+    <div class="card">
+      <h2>2. Validar Fila de Mensageria ISO-8583</h2>
+      <p>Confirmar se há retenção de pacotes transacionais entre o concentrador POS e as bandeiras:</p>
+      <pre><code>kubectl logs deploy/tef-authorizer-gateway -n captura-fisica-prd --tail=100 | grep -i "timeout"</code></pre>
+    </div>
+  </div>
+</body>
+</html>
