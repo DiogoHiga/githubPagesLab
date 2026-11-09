@@ -18,6 +18,7 @@ ALLOWED_CATEGORIES = (
     "arquiteturas",
     "runbooks",
     "procedimentos",
+    "relatorios",
     "apresentacoes",
 )
 

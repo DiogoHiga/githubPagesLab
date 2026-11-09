@@ -1,5 +1,13 @@
 [
   {
+    "title": "Relatório de Melhorias — Recapacity Split",
+    "description": "Resultado do recapacity aplicado aos principais workloads do Split, com indicadores comparativos obtidos no Dynatrace.",
+    "category": "relatorios",
+    "path": "relatorios/relatorio-melhorias-recapacity-split.html",
+    "updated_at": "2026-11-09",
+    "search_text": "Relat rio de Melhorias Recapacity Split Ganhos capacidade resili ncia no cluster aks-split-brs-prd Dynatrace Black Friday Melhoria validada Resumo executivo CPU throttling Mem ria OOMKill Alta disponibilidade HPA Vis consolidada Resultado do aplicado aos principais workloads com indicadores comparativos obtidos Dynatrace. Mais menor conten maior entrada um novo cliente proximidade da foram corrigidos gargalos subdimensionamento aus redund comportamento inadequado autoscaling Throttle dio 21 Redu 62 Risco em zerados Single pod restaurada Pico split-api pods Escala autom tica observada Antes severo APIs cr ticas baseado somente Tr acima ou pr ximos request Quatro sem Depois reduzido por validado na Headroom ampliado Todos os ticos plicas consolidado riscos operacionais identificados eliminados significativamente reduzidos. ambiente passou responder melhor picos ganhou recebeu adicional para absorver aumento volume. Performance representa ciclos dispon veis das aplica es durante carga. Evolu Comparativo workload 76 30 61 pos-worker 51 14 73 split-schedule-api 32 19 40 split-onboarding 24 68 split-onboarding-api 15 53 split-adjustment-api split-cerc-factoring-api 52 split-schedule-creation-api 95 splitcrypto-api 80 split-schedule-worker Est vel split-anticipation-api Zero Destaque limit 400m 800m seguida reduziu permitiu picos. Estabilidade condi passaram operar abaixo margem crescimento. muito identificado zerado 627Mi Uso ap ajuste 45 54 configurado ganho 122 222Mi 102 85 49 164Mi operacional foi eliminado nos workloads. Requests limits ampliados criaram volume limite ria. que operavam apenas uma plica ter restarts deploys falhas ativa triplicada Continuidade Atualiza deixam depender nica inst manter servi vel. toler Restart indisponibilidade queda total desses Escalabilidade corrigido Recursos in cio corre refletir carga real APIs. amplia principal 1000m horizontal 67 600m 33 300m 150m dobrada alinhado usava permanecia enquanto sofria throttling. target duplo 75 reagir reais observado escalando at pods. Conclus dados evidenciam consistente elimina dos ncia. deixou preparado transacional esperados Friday. Fonte: Respons vel: Diogo Sadao Higa Teixeira Correia"
+  },
+  {
     "title": "Apresentação Executiva: SRE para Captura Física e Digital",
     "description": "Estratégia de confiabilidade, observabilidade unificada e arquitetura resiliente para ecossistemas de pagamentos: terminais POS/TEF, gateways de e-commerce e autorizadores em nuvem.",
     "category": "apresentacoes",
@@ -16,12 +24,12 @@
     "search_text": "Dynatrace Observability AKS Procedimento Onboarding OneAgent SRE Operacional: de Clusters no Voltar para Docs Hub POP-OBS-014 PADR OFICIAL Operacional Observabilidade Workloads Guia padronizado implanta do Operator DynaKube em modo cloudNativeFullStack taxonomia obrigat ria labels Kubernetes ativa alertas anomalia CPU Throttling OOMKill SLOs 1. Pr -requisitos Cria Tokens na Tenant Gere os cofre corporativo Azure Key Vault sincronize via External Secrets namespace kubectl create -n secret generic --from-literal apiToken DT_OPERATOR_TOKEN dataIngestToken DT_INGEST_TOKEN 2. Aplica Manifesto Cloud-Native Full-Stack Configure garantindo coleta tricas API ActiveGate inje seletiva nos namespaces neg cio: apiVersion: dynatrace.com/v1beta2 kind: metadata: name: aks-split-bra-prd namespace: spec: apiUrl: https:// tenant-id .live.dynatrace.com/api oneAgent: cloudNativeFullStack: tolerations: effect: NoSchedule key: kubernetes.io/arch value: amd64 activeGate: capabilities: kubernetes-monitoring routing metrics-ingest 3. Checklist Valida s-Onboarding Todos pods dynakube-oneagent dynakube-activegate status Running 1/1 Cluster vis vel menu com eventos CFS ativos. Tags rias dt.owner dt.costcenter dt.tier propagadas automaticamente partir das dos Deployments. Alerting Profile vinculado ao canal plant PagerDuty Microsoft Teams"
   },
   {
-    "title": "Relatório Executivo: Recapacity & Resiliência — Cluster aks-split-bra-prd",
-    "description": "Análise executiva e comparativo Antes vs Depois do ciclo de recapacity, eliminação de OOMKill, redução de CPU Throttling e alta disponibilidade no cluster aks-split-bra-prd.",
-    "category": "arquiteturas",
-    "path": "arquiteturas/relatorio-melhorias-recapacity-split.html",
+    "title": "Runbook de Teste: Latência Alta no Autorizador TEF / POS",
+    "description": "Runbook de validação da automação do GitHub Actions para triagem rápida de degradação e timeout nas transações de Captura Física (POS/TEF).",
+    "category": "runbooks",
+    "path": "runbooks/runbook-teste-latencia-tef-pos.html",
     "updated_at": "2026-11-08",
-    "search_text": "aks-split-bra-prd Dynatrace Black Friday Kubernetes Recapacity HPA OOMKill Relat rio Executivo: Resili ncia Cluster SRE Architecture Report Split Navega do Resumo executivo CPU Throttling Mem ria Alta disponibilidade Capacidade Voltar ao Docs Hub Fonte: Prometheus AKS Revis o: Engenharia de Plataforma VALIDADO EM PRODU S-TUNING Readiness Confiabilidade Mais menor conten maior Consolida ciclo tuning recursos aplicado workloads cr ticas Liquida Financeiro no As mudan eliminaram pontos nicos falha Single Pod zeraram eventos nas janelas pico reduziram drasticamente lat P99 causada por CFS Throttling. THROTTLE DIO -61.9 21 DIO: hor comercial RISCO ZERADO OOMKILL: servi os ticos alerta 100 HA POD: deployments sem redund SPLIT-API ATIVO pods SPLIT-API: escalados degrada Comparativo Lado Lado: Antes vs Depois Baseline s-Recapacity Cen Anterior severo dia picos 48 Limits subdimensionados split-worker-settlement gerando enfileiramento scheduler. sob iminente Working set operando 92 limit durante lotes noturnos concilia o. rodando minReplicas Indisponibilidade moment nea Node Drain upgrades ou Spot eviction. reativo com janela tardia 85 target Scale-out lento rajadas transa es in cio da banc ria. Atual reduzido Ajuste requests/limits baseado percentil P95 real observado via 30 dias. Headroom 35 calibra GOMEMLIMIT MaxRAMPercentage nimo plicas PDB Todos produtivos minReplicas: PodDisruptionBudget topologySpreadConstraints sustentado preventivo Gatilho recalibrado para 65 estabiliza scale-down 300s. container_cpu_cfs_throttled_periods_total Workload Request/Limit Status 250m 500m 1500m 28.4 6.2 Est vel 300m 600m 2000m 24.1 9.4 split-webhook-dispatcher 150m 1000m 16.8 7.1 Uso OOMKills ltimos 14d 512Mi 768Mi 1024Mi 1536Mi 61 930Mi ocorr ncias split-reconciliation-job 384Mi 58 590Mi 1280Mi 54 690Mi Zero Single-Point-of-Failure que operavam split-scheduler split-audit-consumer split-ledger-sync foram promovidos topologia Multi-AZ minAvailable: HorizontalPodAutoscaler v2 teste carga operacional malha pagamentos deployment escalou horizontalmente at maxReplicas: 10 absorvendo 4.200 req/s abaixo 42ms erros HTTP 5xx."
+    "search_text": "Runbook de Teste: Lat ncia Alta no Autorizador TEF POS Voltar ao Documentation Hub TESTE GITHUB ACTIONS CAPTURA SICA Runbook: Documento simples criado para validar indexa autom tica via sem alterar manualmente arquivo docs.json 1. Verificar Sa dos Pods do Gateway Checar status das plicas namespace produtivo sica: kubectl get -n captura-fisica-prd -l app tef-authorizer-gateway top 2. Fila Mensageria ISO-8583 Confirmar se reten pacotes transacionais entre concentrador as bandeiras: logs deploy/tef-authorizer-gateway --tail 100 grep -i timeout"
   },
   {
     "title": "Runbook Operacional: Diagnóstico e Mitigação de OOMKill no AKS",
@@ -30,5 +38,69 @@
     "path": "runbooks/runbook-mitigacao-oomkill-aks.html",
     "updated_at": "2026-11-08",
     "search_text": "AKS Kubernetes OOMKill Runbook Incident Response kubectl aks-split-bra-prd Operacional: Diagn stico Mitiga de no Voltar para SRE Docs Hub VALIDADO SLA P1/P2: 15 MIN Resposta Incidentes Exit Code 137 Procedimento passo triagem imediata coleta evid ncias consumo mem ria segura containers encerrados pelo Linux Kernel OOM Killer em clusters produtivos como Sinal Alerta OOMKilled ExitCode Alvo aks-core- Observabilidade Dynatrace Davis AI Kube-Events Valida s-A Zero Restarts por 30 01 Confirmar Eventos Identificar Pods Afetados Conecte-se ao cluster correspondente inspecione os com reinicializa es recentes motivo rmino estado anterior do container: 1. Selecionar contexto produtivo config use-context 2. Listar verificar lastState.terminated.reason get -n split-prd -o custom-columns NAME:.metadata.name RESTARTS:.status.containerStatuses .restartCount REASON:.status.containerStatuses .lastState.terminated.reason EXIT_CODE:.status.containerStatuses .lastState.terminated.exitCode 3. Inspecionar kernel/cgroup namespace events --sort-by .lastTimestamp grep -iE Killing Evicted 02 Coletar Logs Container Uso Atual Working Set Antes aplicar qualquer altera nos recursos salve ltimos da inst ncia encerrada an lise causa raiz ex: spike payload ou memory leak Extrair as ltimas 250 linhas que sofreu crash nome-do-pod --previous --tail /tmp/oom-crash-logs.txt tempo real comparado aos limits configurados top --containers describe deployment split-worker-settlement -A -E Requests 03 Emergencial Right-Sizing Runtime Flags Caso tr fego esteja impactado node pool possua folga aplique patch elevando limit 50 abra PR imediato reposit rio GitOps evitar drift: resources deployment/split-worker-settlement --requests cpu 600m 1024Mi --limits 2000m 1536Mi Acompanhar rollout seguro sem indisponibilidade status --timeout 180s"
+  },
+  {
+    "title": "Apresentação: Governança de SLOs e Error Budget — Captura Física e Digital",
+    "description": "Deck de governança mensal apresentando indicadores de disponibilidade (SLIs/SLOs), consumo de Error Budget e priorização de confiabilidade vs novas features.",
+    "category": "apresentacoes",
+    "path": "apresentacoes/apresentacao-slos-error-budget-captura-2026.html",
+    "updated_at": "2026-11-05",
+    "search_text": "Apresenta o: Governan de SLOs Error Budget Captura sica Digital Voltar ao Documentation Hub Painel executivo das metas disponibilidade transacional 99 95 na POS/TEF 90 no Gateway Pol tica Acima 50 saldo: Ritmo normal releases experimentos controlados Chaos Engineering. Abaixo 20 Prioriza autom picos resili ncia tuning recursos automa auto-healing."
+  },
+  {
+    "title": "Procedimento Operacional: Checklist de Pré-Aquecimento (Warm-up) de Clusters AKS para Black Friday",
+    "description": "Guia passo a passo para pré-escalonamento de Node Pools, ajuste de pisos de HPA, validação de cotas Azure e congelamento de mudanças (Change Freeze) para a Black Friday.",
+    "category": "procedimentos",
+    "path": "procedimentos/procedimento-checklist-aquecimento-black-friday.html",
+    "updated_at": "2026-11-05",
+    "search_text": "Procedimento Operacional: Checklist de Pr -Aquecimento Warm-up Clusters AKS para Black Friday Voltar ao Documentation Hub READINESS executado em D-3 antes grandes eventos sazonais nos Captura sica Digital. Itens Obrigat rios Verifica Elevar minReplicas dos servi os tier-0 split-api tef-authorizer pix-spi-gateway 70 da capacidade pico projetada. Validar disponibilidade vCPUs Standard_D8s_v5 na regi brazilsouth eastus2 Silenciar janelas manuten autom tica Node Upgrade do durante per odo Change Freeze."
+  },
+  {
+    "title": "Runbook Operacional: Consumer Lag Crítico no Kafka de Liquidação e Split",
+    "description": "Diagnóstico e mitigação de acúmulo de mensagens (Consumer Lag) nos tópicos Kafka de liquidação financeira e conciliação de Captura Física e Digital.",
+    "category": "runbooks",
+    "path": "runbooks/runbook-saturacao-fila-kafka-conciliacao.html",
+    "updated_at": "2026-10-22",
+    "search_text": "Runbook Operacional: Consumer Lag Cr tico no Kafka de Liquida Split Voltar ao Documentation Hub MENSAGERIA Passos para destravar consumidores em CrashLoopBackOff ou rebalanceamento constante grupo cg-split-settlement-workers Inspe Parti es Escalonamento Inspecionar por pico transa aprovadas kafka-consumer-groups.sh --bootstrap-server kafka-prd:9092 --group --describe Escalar workers at limite 24 plicas kubectl scale deploy/split-worker-settlement -n split-prd --replicas"
+  },
+  {
+    "title": "Topologia de Referência: Gateway E-Commerce, Pix Síncrono e Autenticação 3DS 2.2",
+    "description": "Arquitetura de referência dos microsserviços de Captura Digital cobrindo checkout transparente, motor antifraude, 3D-Secure 2.2 e liquidação Pix SPI.",
+    "category": "arquiteturas",
+    "path": "arquiteturas/arquitetura-gateway-pix-3ds-captura-digital.html",
+    "updated_at": "2026-10-22",
+    "search_text": "Topologia de Refer ncia: Gateway E-Commerce Pix ncrono Autentica 3DS 2.2 Voltar ao Documentation Hub ARQUITETURA CAPTURA DIGITAL Vis fim da esteira no cluster aks-digital-checkout-prd incluindo prote contra tempestade retentativas Retry Storm Circuit Breaker por bandeira. Fluxo Cr tico SLOs API Tokeniza PCI-DSS: Cofre cart es isolado com resposta P95 abaixo 25ms. Orquestrador Antifraude: Fallback autom para frictionless em caso degrada do Directory Server. Conector DICT SPI: Gera QR Code din mico webhook confirma menos 800ms."
+  },
+  {
+    "title": "Procedimento Operacional: Rotação Zero-Downtime de Certificados mTLS da Frota POS e TEF",
+    "description": "POP para renovação programada da cadeia de certificados ICP/mTLS nos concentradores TEF e gateways de Captura Física sem desconexão dos terminais POS.",
+    "category": "procedimentos",
+    "path": "procedimentos/procedimento-rotacao-certificados-mtls-pos.html",
+    "updated_at": "2026-10-04",
+    "search_text": "Procedimento Operacional: Rota Zero-Downtime de Certificados mTLS da Frota POS TEF Voltar ao Documentation Hub SEGURAN Roteiro padr utilizando cert-manager trust-manager para manter dupla cadeia CA antiga nova ativa durante janela atualiza OTA dos terminais. Etapas Execu Publicar novo bundle no Secret pos-mtls-ca-bundle com 30 dias anteced ncia do vencimento. Validar handshake TLS 1.3 em can rio tr fego gateway tef-ingress-canary Promover certificado folha via rollout progressivo nos clusters AKS produtivos."
+  },
+  {
+    "title": "Runbook Operacional: Contingência de Comunicação com Bandeiras (Visa / Mastercard / Elo)",
+    "description": "Ações imediatas de drenagem de link e chaveamento de rota de autorização quando há perda de conectividade ou rejeição HTTP/ISO nas conexões com bandeiras.",
+    "category": "runbooks",
+    "path": "runbooks/runbook-contingencia-bandeiras-emv.html",
+    "updated_at": "2026-10-04",
+    "search_text": "Runbook Operacional: Conting ncia de Comunica com Bandeiras Visa Mastercard Elo Voltar ao Documentation Hub AUTORIZA Procedimento para chaveamento link ExpressRoute Direct Connect secund rio quando taxa Response Code 91 Issuer or Switch Inoperative ultrapassa Comandos Rota Verificar status dos neis das kubectl exec -it deploy/brand-connector-router -n autorizacao-prd -- ./cli --all-brands Drenar prim degradado for ar tr fego pela set env PRIMARY_LINK_DRAINED true"
+  },
+  {
+    "title": "Apresentação Executiva: Post-Mortem Blameless & Plano de Ação — Incidente TEF Q3",
+    "description": "Apresentação executiva detalhando a linha do tempo, causa raiz (exaustão de pool de conexões no concentrador TEF) e melhorias de resiliência implementadas.",
+    "category": "apresentacoes",
+    "path": "apresentacoes/apresentacao-postmortem-incidente-tef-q3.html",
+    "updated_at": "2026-09-15",
+    "search_text": "Apresenta Executiva: Post-Mortem Blameless Plano de Incidente TEF Q3 Voltar ao Documentation Hub SRE Revis executiva da degrada parcial 11 minutos ocorrida na malha regional as defesas arquiteturais definitivas implantadas pela equipe SRE. Principais Aprendizados es Conclu das MTTR reduzido para min: Detec autom tica pelo alerta anomalia Davis AI no Dynatrace em 90 segundos. Isolamento Bulkhead: Separa dos pools conex por adquirente/bandeira impedir cont gio entre filas."
+  },
+  {
+    "title": "Arquitetura da Malha ISO-8583 Multi-Região para Captura Física (POS/TEF)",
+    "description": "Desenho de referência da topologia ativo-ativo para concentradores TEF, terminais POS e roteamento ISO-8583 com failover sub-segundo entre regiões.",
+    "category": "arquiteturas",
+    "path": "arquiteturas/arquitetura-malha-iso8583-alta-disponibilidade.html",
+    "updated_at": "2026-09-15",
+    "search_text": "Arquitetura da Malha ISO-8583 Multi-Regi para Captura sica POS/TEF Voltar ao Documentation Hub POS TEF Topologia de alta disponibilidade projetada sustentar mais 18.000 transa es por segundo TPS originadas em maquininhas pinpads dedicados. Componentes Transacional Terminais EMV: Conex persistente mTLS 1.3 via APN dedicada fallback Wi-Fi. Ingress L4 Envoy NLB: Balanceamento sockets TCP persistentes com health-check ativo cada segundos. Autorizador Cluster aks-pos-core-prd Convers bitmap gRPC interno lat ncia P99 alvo 180ms."
   }
 ]

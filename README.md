@@ -37,6 +37,7 @@ Repositório central da equipe de **SRE Captura Física e Digital**, reunindo ag
 │   ├── arquiteturas/                 # Relatórios executivos de capacidade, resiliência e arquitetura
 │   ├── runbooks/                     # Runbooks operacionais de resposta a incidentes
 │   ├── procedimentos/                # Procedimentos operacionais padrão (POPs) e guias de onboarding
+│   ├── relatorios/                   # Relatórios executivos e técnicos (Recapacity, Post-Mortems, Black Friday)
 │   └── apresentacoes/                # Apresentações técnicas em HTML (slides interativos)
 └── README.md
 ```

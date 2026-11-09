@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SRE Captura Física e Digital — Documentation Hub</title>
-  <meta name="description" content="Local centralizado para documentações de SRE Captura Física e Digital — Arquiteturas, Runbooks, Procedimentos e Apresentações.">
+  <meta name="description" content="Local centralizado para documentações de SRE Captura Física e Digital — Arquiteturas, Runbooks, Procedimentos, Relatórios e Apresentações.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -407,6 +407,12 @@
       border: 1px solid rgba(125, 211, 252, 0.25);
     }
 
+    .category-badge.relatorios {
+      background: rgba(251, 191, 36, 0.12);
+      color: #fbbf24;
+      border: 1px solid rgba(251, 191, 36, 0.32);
+    }
+
     .category-badge.apresentacoes {
       background: rgba(168, 85, 247, 0.14);
       color: #c084fc;
@@ -510,7 +516,7 @@
       </div>
       <h1 class="exec-title">Documentation Hub</h1>
       <p class="exec-subtitle">
-        Local centralizado para documentações de SRE Captura Física e Digital — Arquiteturas, Runbooks, Procedimentos e Apresentações.
+        Local centralizado para documentações de SRE Captura Física e Digital — Arquiteturas, Runbooks, Procedimentos, Relatórios e Apresentações.
       </p>
     </header>
 
@@ -556,6 +562,9 @@
         <button type="button" class="filter-btn" data-category="procedimentos">
           Procedimentos <span class="filter-count" id="badge-procedimentos">0</span>
         </button>
+        <button type="button" class="filter-btn" data-category="relatorios">
+          Relatórios <span class="filter-count" id="badge-relatorios">0</span>
+        </button>
         <button type="button" class="filter-btn" data-category="apresentacoes">
           Apresentações <span class="filter-count" id="badge-apresentacoes">0</span>
         </button>
@@ -588,6 +597,7 @@
       arquiteturas: 'Arquitetura',
       runbooks: 'Runbook',
       procedimentos: 'Procedimento',
+      relatorios: 'Relatório',
       apresentacoes: 'Apresentação',
     };
 
@@ -634,6 +644,7 @@
         arquiteturas: docs.filter(d => d.category === 'arquiteturas').length,
         runbooks: docs.filter(d => d.category === 'runbooks').length,
         procedimentos: docs.filter(d => d.category === 'procedimentos').length,
+        relatorios: docs.filter(d => d.category === 'relatorios').length,
         apresentacoes: docs.filter(d => d.category === 'apresentacoes').length,
       };
 
@@ -646,6 +657,7 @@
       setCount('badge-arquiteturas', counts.arquiteturas);
       setCount('badge-runbooks', counts.runbooks);
       setCount('badge-procedimentos', counts.procedimentos);
+      setCount('badge-relatorios', counts.relatorios);
       setCount('badge-apresentacoes', counts.apresentacoes);
     }
 
